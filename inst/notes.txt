@@ -1,0 +1,55 @@
+Effect Types by Group
+
+Single Group
+# mean
+** r
+** cohens.d/hedges.g
+** cohens.d.sigma
+** unstandardized
+
+Only Two Groups
+# correlation
+# slope
+
+> 2 Groups
+# mean (w/contrast)
+** r
+** cohens.d/hedges.g
+** cohens.d.sigma
+** unstandardized
+** glass.delta
+
+# mean.diffs (w/contrast)
+** r
+** cohens.d
+** cohens.d.sigma
+** hedges.d
+** unstandardized
+** glass.delta
+
+h1. Unstandardized
+
+Single Group
+mean
+
+Two Groups
+slope
+
+> 2 Groups
+mean 
+mean (contrast)
+mean diff
+mean diff (contrast)
+
+By Effect Type
+
+unstandardized: mean, mean (contrast), mean diff, mean contrast
+
+cohen's d, hedges g: mean, mean (contrast), mean diff, mean contrast
+** Each of these can be done w/ glass control
+
+cohen's d sigma, mean, mean(contrast), mean diff, mean contrast
+** Each of these can be done w/ glass control
+
+r: mean, mean (contrast), mean diff, mean contrast
+
