@@ -199,3 +199,35 @@ test.meanUnweightedBoot <- function() {
   bootES:::meanUnweightedBoot(twoGpsA$x, freq=rep(1, nrow(twoGpsA)),
                               grps=grpLabels)
 }
+
+test.determineStat <- function() {
+  ## Test the function that determines which statistic to use
+  g1        = c(11, 12, 13, 14, 15)
+  g2        = c(26, 27, 28, 29)
+  grpLabels = rep(c("A", "B"), times=c(length(g1), length(g2)))
+  twoGpsA   = data.frame(x=c(g1, g2), team=grpLabels)
+  twoGpsErr = data.frame(x=c(g1, g2), team=rep("A", length(c(g1, g2))))
+  lambdas   = c(A=1, B=-1)
+
+  ## Stat should be mean
+  test = data.frame(score=c(g1, g2))
+  checkEquals(bootES:::determineStat(test), 'mean')
+  
+  ## Stat should be slope
+  test = data.frame(x=c(g1, g2), y=c(-g1, -g2))
+  checkEquals(bootES:::determineStat(test, effect.type='slope'), 'slope')
+  
+  ## Stat should be cor
+  test = data.frame(x=c(g1, g2), y=c(-g1, -g2))
+  checkEquals(bootES:::determineStat(test), 'cor')
+
+  ## Stat should be contrast
+  test.dat = data.frame(score=c(g1, g2), group=grpLabels)
+  test = bootES:::determineStat(test, grps=grpLabels, contrasts=lambdas)
+  checkEquals(test, 'contrast')
+  
+  ## Stat should be cor.diff
+  test.dat = data.frame(score=c(g1, g2), group=grpLabels)
+  test = bootES:::determineStat(test, grps=grpLabels)
+  checkEquals(test, 'cor.diff')
+}

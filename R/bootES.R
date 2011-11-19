@@ -5,8 +5,8 @@ bootES <- function(dat, R=1000, data.col, grp.col,
                    stat=c("mean", "contrast", "cor", "cor.diff", "slope"),
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r"),
-                   contrasts,                   
-                   glass.control,
+                   contrasts=NULL,                   
+                   glass.control=NULL,
                    scale.weights=FALSE,
                    ci.type=c("bca", "norm", "basic", "stud", "perc", "all", "none"),
                    ci.conf=0.95,
@@ -254,4 +254,27 @@ printTerse <- function(x) {
   cat(sprintf("%.2f%% %s Confidence Interval\n", 100 * x[["ci.conf"]], ci.type))
   print(res)
   cat("\n")
+}
+
+determineStat <- function(dat, grps=NULL, effect.type=NULL, contrasts=NULL) {
+  ## Based on the arguments passed to bootES, determine the type of statistic to
+  ## calculate
+  res = ''
+  if (is.null(grps)) {
+    if (ncol(dat) == 1) 
+      res = 'mean'
+    else
+      res <- if (identical(effect.type, 'slope')) 'slope' else 'cor'
+  } else {
+    if (!is.null(contrasts)) {
+      res = 'contrast'
+    } else {
+      if (length(unique(grps)) == 2)
+        res = 'cor.diff'
+      else
+        stop('Within-subject difference between correlations not implemented.')
+             
+    }
+  }
+  return(res)
 }
