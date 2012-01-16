@@ -9,23 +9,26 @@ calcCohensD <- function(vals, freq, grps,
   ## 
   ## Args:
   ##   @param vals a numeric vector of values
-  ##   @param freq a frequency vector of length equal to the number of records in 
-  ##    'dat' indicating how many times an observation should be drawn
+  ##   @param freq a frequency vector of length equal to the number of records
+  ##     in 'dat' indicating how many times an observation should be drawn
   ##     from each sample.
   ##   @param grps a grouping vector of the same length as 'vals'
-  ##   @param cohens.d.sigma Whether to use the population standard deviation instead of
-  ##     the sample standard deviation
-  ##   @param glass.control an optional group to use to calculate standard deviation
+  ##   @param cohens.d.sigma Whether to use the population standard
+  ##     deviation instead of the sample standard deviation
+  ##   @param glass.control a character vector of length 1 specifying the
+  ##     optional group to use to calculate standard deviation
   ##
   ## Details:
-  ##   This function is meant to be passed as the 'statistic' argument to the 'boot'
-  ##   function. 'freq' should be a frequency vector of the type returned by 'boot'.
+  ##   This function is meant to be passed as the 'statistic' argument to the
+  ##   'boot' function. 'freq' should be a frequency vector of the type returned
+  ##   by 'boot'.
 
   ## Get the integer indices of the different groups.
   grp.idx = split(seq_along(vals), grps, drop=TRUE)   
   grp.nms = names(grp.idx)
   
-  ## Calculate the mean and sum-of-squares for the bootstrap samples from each group.
+  ## Calculate the means and sums-of-squares for the bootstrap samples from each
+  ## group.
   means = ss = numeric()
   glass.sd = NULL
   for (nm in grp.nms) {

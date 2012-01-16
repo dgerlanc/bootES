@@ -2,45 +2,50 @@
 ## High-level function for bootstrap analyses using the 'boot' package
 
 bootES <- function(dat, R=1000, data.col, grp.col,
-                   stat=c("mean", "contrast", "cor", "cor.diff", "slope"),
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
-                     "cohens.d.sigma", "r"),
+                     "cohens.d.sigma", "r", "slope"),
                    contrasts=NULL,                   
                    glass.control=NULL,
                    scale.weights=FALSE,
-                   ci.type=c("bca", "norm", "basic", "stud", "perc", "all", "none"),
+                   ci.type=c("bca", "norm", "basic", "stud", "perc",
+                     "all", "none"),
                    ci.conf=0.95,
                    verbose=0) {
   
-  ## Performs different variants of bootstrap analyses for calculating effect sizes.
+  ## Performs different variants of bootstrap analyses for calculating
+  ## effect sizes.
   ##
   ## Args:
-  ##   dat           : a vector or data frame containing the one or more columns of values
-  ##                   (required), group labels (optional), and contrasts (optional)
-  ##                   for each sample
+  ##   dat           : a vector or data frame containing the one or more
+  ##                   columns of values (required), group labels (optional),
+  ##                   and contrasts (optional) for each sample
   ##   R             : the number of bootstrap 'repetitions' to perform
   ##   data.col      : The column in 'dat' containing the sample values
   ##   grp.col       : The column in 'dat' containing the grouping info
   ##   stat          : The statistic to calculate
-  ##   effect.type   : The type of standardization to perform when calculating 'stat'
-  ##   contrasts     : A named vector specifying the lambdas for different groups in 'dat'.
-  ##                   The default applies to the simplest, 2-group unweighted case
-  ##   glass.control : The group for which the standard deviation should be used, eg.
-  ##     "glass.control='A'"
+  ##   effect.type   : The type of standardization to perform
+  ##   contrasts     : A named vector specifying the lambdas for different
+  ##                   groups in 'dat'. The default applies to the simplest,
+  ##                   2-group unweighted case
+  ##                   
+  ##   glass.control : The group for which the standard deviation should
+  ##                   be used, eg. "glass.control='A'"
+  ##     
   ##   scale.weights : TRUE/FALSE, scale the lambdas to [-1, 1]
-  ##   ci.type       : The type of confidence interval to generate (see 'boot.ci')
+  ##   ci.type       : The type of confidence interval to generate
+  ##                   (see 'boot.ci')
   ##   ci.conf       : The confidence level of the interval
   ##   verbose       : Higher levels generate more output
   ##
   ## Returns:
   ##   An object of class 'bootES' and 'boot'
   ##
-  ## Details: If 'R' is not a whole number, it will be round down to the nearest whole number.
-  ##   * stat=cor: 'dat' must be a two-column data frame, where each of the columns is numeric
+  ## Details: If 'R' is not a whole number, it will be round down to the nearest
+  ## whole number.  * stat=cor: 'dat' must be a two-column data frame, where
+  ## each of the columns is numeric
   ##
 
   ## Error handling
-  stat        = match.arg(stat)
   effect.type = match.arg(effect.type)
   ci.type     = match.arg(ci.type)
   
@@ -99,7 +104,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
       stop("Must specify a 'grp.col' when providing a 'contrasts' argument.")
 
     ## Scale contrasts if specified and not using the slope function
-    if (scale.weights && abs(sum(contrasts)) > 1e-4 && stat != "slope")
+    if (scale.weights && abs(sum(contrasts)) > 1e-4 && effect.type != "slope")
       lmbds = scaleLambdasBySide(lmbds)    
     
     lmbds = contrasts[match(grps, names(contrasts))]
@@ -110,6 +115,9 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     if (any(na.lmbds))
       stop(paste(sQuote(no.lmbds), collapse=", "), " have missing lambdas.")
   }
+
+  ## Determine the 'stat' based on the passed arguments
+  stat = determineStat(dat, grps, effect.type, lmbds)
   
   ## Error handling for the stat='cor'
   if (stat == "cor") {
@@ -170,7 +178,8 @@ bootES <- function(dat, R=1000, data.col, grp.col,
   if (!verbose %in% 0:2)
     stop("'verbose' must be 0, 1, or 2.")
   
-  ## Simplest Case: No groups, so we can calculate all of the stats for a single group
+  ## Simplest Case: No groups, so we can calculate all of the stats for a single
+  ## group
   n.grps = length(unique(grps))
   single.group = (is.null(grps) || n.grps == 1) && stat != "cor"
   if (single.group) {
@@ -259,21 +268,43 @@ printTerse <- function(x) {
 determineStat <- function(dat, grps=NULL, effect.type=NULL, contrasts=NULL) {
   ## Based on the arguments passed to bootES, determine the type of statistic to
   ## calculate
+  ##
+  ## Args:
+  ##  dat:
+  ##  grps:
+  ##  effect.type:
+  ##  contrasts:
+  ## 
+  
   res = ''
   if (is.null(grps)) {
-    if (ncol(dat) == 1) 
+    ## Single Group
+    ## (1) slope -> slope
+    ## (2) r -> r unless there are 2 numeric columns -> cor
+    ## (3) otherwise -> mean
+    if (identical(effect.type, 'slope')) {
+      res = 'slope'
+    } else if (identical(effect.type, 'r')) {
+      do.cor = (is.data.frame(dat) && ncol(dat) == 2 &&
+                is.numeric(dat[[1]]) && is.numeric(dat[[2]]))
+      res = if (do.cor) 'cor' else 'r'
+    } else {
       res = 'mean'
-    else
-      res <- if (identical(effect.type, 'slope')) 'slope' else 'cor'
-  } else {
+    }
+  } else { 
     if (!is.null(contrasts)) {
       res = 'contrast'
     } else {
-      if (length(unique(grps)) == 2)
-        res = 'cor.diff'
-      else
-        stop('Within-subject difference between correlations not implemented.')
-             
+      if (is.numeric(dat)) {
+        res = 'mean'
+      } else {
+        useCorDiff = is.data.frame(dat) && length(unique(grps)) == 2 &&
+        ncol(dat) > 2
+        if (useCorDiff)
+          res = 'cor.diff'
+        else
+          stop('Within-subject difference between correlations not implemented.')
+      }
     }
   }
   return(res)

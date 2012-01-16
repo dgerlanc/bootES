@@ -17,18 +17,20 @@ rMean <- function(x)
 dMean <- function(x)
   mean(x) / sd(x)
 
-## Compute the effect size d for a mean effect for resamples in the boot() command.
-dMeanBoot <- function(v, i)
-  mean(v[i]) / sd(v[i])
+## Compute the effect size d for a mean effect for resamples in the boot()
+## command.
+dMeanBoot <- function(x, i)
+  mean(x[i]) / sd(x[i])
 
 ## Compute the effect size 'Cohen's sigma d' for a mean effect for
 ## resamples in the boot() command.
 dSigmaMeanBoot <- function(x, i)
   mean(x[i]) / sqrt(sum((x[i] - mean(x[i]))^2) / length(x[i]))
 
-## Compute the effect size r for a mean effect for resamples in the boot() command.
-rMeanBoot <- function(v, i)
-  mean(v[i]) / sqrt(mean(v[i])^2 + sum((v[i] - mean(v[i]))^2) / length(v[i]))
+## Compute the effect size r for a mean effect for resamples in the boot()
+## command.
+rMeanBoot <- function(x, i)
+  mean(x[i]) / sqrt(mean(x[i])^2 + sum((x[i] - mean(x[i]))^2) / length(x[i]))
 
 
 
