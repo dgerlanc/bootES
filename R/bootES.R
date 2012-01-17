@@ -44,6 +44,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
   ## whole number.  * stat=cor: 'dat' must be a two-column data frame, where
   ## each of the columns is numeric
   ##
+  ## TODO: Parse, then evaluate the 'boot' call
 
   ## Error handling
   effect.type = match.arg(effect.type)
@@ -107,7 +108,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     if (scale.weights && abs(sum(contrasts)) > 1e-4 && effect.type != "slope")
       lmbds = scaleLambdasBySide(lmbds)    
     
-    lmbds = contrasts[match(grps, names(contrasts))]
+    lmbds = contrasts
     
     ## Check that there are no NA lambdas.
     na.lmbds = is.na(lmbds)
@@ -188,12 +189,12 @@ bootES <- function(dat, R=1000, data.col, grp.col,
                        r              = rMeanBoot,
                        hedges.g       = dMeanBoot,
                        cohens.d       = dMeanBoot,
-                       cohens.d.sigma = dSigmaMeanBoot)
-    res = boot(vals, statistic=boot.fun, R=R) # TODO: Parse, then evaluate this call
+                       cohens.d.sigma = dSigmaMeanBoot)    
+    res = boot(vals, statistic=boot.fun, R=R) 
   } else { # Two or more groups
     if (effect.type %in% c("cohens.d", "hedges.g", "cohens.d.sigma")) {
       res = boot(vals, calcCohensD, R, stype="f", strata=grps, grps=grps,
-        lambdas=lmbds, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
+        cohens.d.sigma=(effect.type == "cohens.d.sigma"),
         glass.control=glass.control)
     } else if (stat == "cor") {
       res = boot(dat, statistic=corBoot, R=R) 
