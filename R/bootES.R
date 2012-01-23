@@ -104,11 +104,11 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     if (missing(grp.col))
       stop("Must specify a 'grp.col' when providing a 'contrasts' argument.")
 
-    ## Scale contrasts if specified and not using the slope function
-    if (scale.weights && abs(sum(contrasts)) > 1e-4 && effect.type != "slope")
-      lmbds = scaleLambdasBySide(lmbds)    
-    
     lmbds = contrasts
+    
+    ## Scale contrasts if specified and not using the slope function
+    if (scale.weights && effect.type != "slope")
+      lmbds = scaleLambdasBySide(lmbds)    
     
     ## Check that there are no NA lambdas.
     na.lmbds = is.na(lmbds)
@@ -151,7 +151,8 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     if (!is.numeric(grps)) {
       err.msg <- paste("If data in group column is not numeric, a numeric",
                        "'contrasts' argument with names corresponding to the",
-                       "values in the 'grp.col' must be provided.", collapse=" ")
+                       "values in the 'grp.col' must be provided.",
+                       collapse=" ")
       if (!is.numeric(contrasts)) 
         stop(err.msg)
 
@@ -207,12 +208,18 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     } else if (stat == "mean" && effect.type == "unstandardized") {
       res = boot(vals, meanUnweightedBoot, R, stype="f", strata=grps, grps=grps)
     } else if (stat == "contrast" && effect.type == "unstandardized") {
-      res = boot(vals, meanDiffBoot, R, stype="f", strata=grps, grps=grps)
+      res = boot(vals, calcUnstandardizedMean, R, stype="f", strata=grps,
+        grps=grps, lambdas=lmbds)
     } else if (stat == "contrast" || effect.type == "r") {
       res = boot(vals, calcPearsonsR, R, stype="f", strata=grps, grps=grps,
         lambdas=lmbds)
     } else {
-      stop("This combination of 'stat' and 'effect.type' not yet implemented!")
+      fmt = paste("effect.type: %s for a 'dat' of class '%s' of length %d",
+        "with data.col of class %s and grp.col of class %s not implemented.",
+        collapse="")
+      msg = sprintf(msg, effect.type, class(dat), length(dat), class(grps),
+        class(vals))
+      stop(msg)
     }
   }
 

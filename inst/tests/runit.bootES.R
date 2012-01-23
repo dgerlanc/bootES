@@ -87,25 +87,10 @@ test.bootES.univariate <- function() {
     
 }
 
-test.bootES.verbosity <- function() {
-  g1        = c(11, 12, 13, 14, 15)
-  g2        = c(26, 27, 28, 29)
-  grpLabels = rep(c("A", "B"), times=c(length(g1), length(g2)))
-  twoGpsA   = data.frame(x=c(g1, g2), team=grpLabels)
-  lambdas   = c(A=1, B=-1)
-  
-  ## Integration test of stat='contrast' and effect.type='unstandardized'
-  set.seed(1)
-  truth     = mean(g1) - mean(g2)
-  unstdDiff.res = bootES(twoGpsA, R=1000, data.col="x", grp.col="team",
-    effect.type="unstandardized", contrasts=lambdas)
-  
-}
-
 test.bootES.multivariate <- function() {
   ## Test the functioning of the multivariate bootstrap functions through the
   ## bootES interface.
-
+  
   g1        = c(11, 12, 13, 14, 15)
   g2        = c(26, 27, 28, 29)
   grpLabels = rep(c("A", "B"), times=c(length(g1), length(g2)))
@@ -123,12 +108,7 @@ test.bootES.multivariate <- function() {
   ## Integration test of stat='contrast' and effect.type='unstandardized' where
   ## there is only one group. This should cause an error.
   unstdDiff.err = try(bootES(twoGpsErr, R=1000, data.col="x", grp.col="team",
-    effect.type="unstandardized"), silent=TRUE)
-  
-  ## Integration test of stat='contrast' and effect.type='r'
-  ## ToDo!
-  path = system.file("gender.csv", package="bootES")
-  gender = read.csv(path, strip.white=TRUE, header=TRUE)
+    effect.type="unstandardized"), silent=TRUE)    
   
   ## Integration test of stat='cor'
   set.seed(1)
@@ -150,19 +130,35 @@ test.bootES.multivariate <- function() {
   checkEquals(truth, cor.diff.res$t0)
 }
 
-test.bootES.mean <- function() {
-  ## Integration tests of stat='mean' w/ other effect.types
-  g1        = c(11, 12, 13, 14, 15)
-  g2        = c(26, 27, 28, 29)
-  grpLabels = rep(c("A", "B"), times=c(length(g1), length(g2)))
-  twoGpsA   = data.frame(x=c(g1, g2), team=grpLabels)
-  twoGpsErr = data.frame(x=c(g1, g2), team=rep("A", length(c(g1, g2))))
-  lambdas   = c(A=1, B=-1)
+test.bootES.contrast <- function() {
+
+  path = system.file("gender.csv", package="bootES")
+  gender = read.csv(path, strip.white=TRUE, header=TRUE)
   
-  effect.types = eval(formals(bootES)[["effect.type"]])
-  for (type in effect.types) {
-    next
-  }
+  ## Assert: Calculated value matches known value for an unstandardized
+  ## contrast
+  set.seed(1)
+  truth = -522.43
+  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+    contrasts = c(A = -40, B = -10, C = 50))
+  checkEquals(truth, test$t0, tol=1e-2)
+
+  ## Assert: Calculated value matches known value for an unstandardized
+  ## contrast with weights scaled
+  set.seed(1)
+  truth.contrast.scaled = -10.4486
+  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+    contrasts = c(A = -40, B = -10, C = 50), scale.weights=TRUE)
+  checkEquals(truth.contrast.scaled, test$t0, tol=1e-4)
+
+  ## Assert: Calculated value matches known value for an unstandardized
+  ## contrast with weights scaled and a group left out
+  set.seed(1)
+  truth.contrast.omit = -10.4486
+  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+    contrasts = c(A = -1, C = 1))
+  checkEquals(truth.contrast.scaled, test$t0, tol=1e-4)
+  
 }
 
 test.bootES.verbose <- function() {
@@ -190,14 +186,4 @@ test.bootES.verbose <- function() {
   checkTrue(grepl("\\[1,\\] [\\d.]+ +[\\d.]+ +[\\d.]+", test[3], perl=TRUE))
 }
 
-test.meanUnweightedBoot <- function() {
-  options(warn=2)
-  g1        = c(11, 12, 13, 14, 15)
-  g2        = c(26, 27, 28, 29)
-  grpLabels = rep(c("A", "B"), times=c(length(g1), length(g2)))
-  twoGpsA   = data.frame(x=c(g1, g2), team=grpLabels)
-
-  bootES:::meanUnweightedBoot(twoGpsA$x, freq=rep(1, nrow(twoGpsA)),
-                              grps=grpLabels)
-}
 
