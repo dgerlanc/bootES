@@ -118,7 +118,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   }
 
   ## Determine the 'stat' based on the passed arguments
-  stat = determineStat(dat, grps, effect.type, lmbds)
+  stat = determineStat(dat, data.col, grps, effect.type, lmbds)
   
   ## Error handling for the stat='cor'
   if (stat == "cor") {
@@ -273,7 +273,11 @@ printTerse <- function(x) {
   cat("\n")
 }
 
-determineStat <- function(dat, grps=NULL, effect.type=NULL, contrasts=NULL) {
+determineStat <- function(dat,
+                          data.col=NULL,
+                          grps=NULL,
+                          effect.type=NULL,
+                          contrasts=NULL) {
   ## Based on the arguments passed to bootES, determine the type of statistic to
   ## calculate
   ##
@@ -283,19 +287,22 @@ determineStat <- function(dat, grps=NULL, effect.type=NULL, contrasts=NULL) {
   ##  effect.type:
   ##  contrasts:
   ## 
-  
+
+  do.cor = (is.data.frame(dat) && ncol(dat) == 2 && is.numeric(dat[[1]]) && 
+            is.numeric(dat[[2]]))
   res = ''
   if (is.null(grps)) {
     ## Single Group
-    ## (1) slope -> slope
-    ## (2) r -> r unless there are 2 numeric columns -> cor
-    ## (3) otherwise -> mean
+    ## - slope -> slope
+    ## - data.col == NULL -> cor
+    ## - r -> r
+    ## - otherwise -> mean
     if (identical(effect.type, 'slope')) {
       res = 'slope'
+    } else if (is.null(data.col) && do.cor) {
+      res = 'cor'
     } else if (identical(effect.type, 'r')) {
-      do.cor = (is.data.frame(dat) && ncol(dat) == 2 &&
-                is.numeric(dat[[1]]) && is.numeric(dat[[2]]))
-      res = if (do.cor) 'cor' else 'r'
+      res = 'r'
     } else {
       res = 'mean'
     }
