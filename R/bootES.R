@@ -1,7 +1,7 @@
 ## Daniel Gerlanc and Kris Kirby (2010)
 ## High-level function for bootstrap analyses using the 'boot' package
 
-bootES <- function(dat, R=1000, data.col, grp.col,
+bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r", "slope"),
                    contrasts=NULL,                   
@@ -69,7 +69,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     stop("R must be an integer of length 1 and greater than 0")
   
   ## Check and extract 'data.col'.
-  if (!missing(data.col)) {
+  if (!is.null(data.col)) {
     if (!is.character(data.col))
       stop("'data.col' must be a character vector.")
   
@@ -81,7 +81,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
   
   ## Check and extract 'grp.col'.
   grps = NULL
-  if (!missing(grp.col)) {
+  if (!is.null(grp.col)) {
     if (!is.character(grp.col)) 
       stop("'grp.col' must be a character vector.")
     
@@ -97,11 +97,11 @@ bootES <- function(dat, R=1000, data.col, grp.col,
   
   ## Check and extract contrasts.
   lmbds = NULL
-  if (!missing(contrasts)) {
+  if (!is.null(contrasts)) {
     if (is.null(names(contrasts)))
       stop("'contrasts' must be a named vector")
     
-    if (missing(grp.col))
+    if (is.null(grp.col))
       stop("Must specify a 'grp.col' when providing a 'contrasts' argument.")
 
     lmbds = contrasts
@@ -133,7 +133,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
     if (!is.valid)
       stop("'The first two columns of 'dat' must be numeric.'")
 
-    if (missing(grp.col))
+    if (is.null(grp.col))
       stop("You must specify a grouping column.")
     
     if (length(unique(grps)) != 2)
@@ -167,7 +167,7 @@ bootES <- function(dat, R=1000, data.col, grp.col,
   }
   
   ## Error handling for 'glass.control'
-  if (!missing(glass.control)) {
+  if (!is.null(glass.control)) {
     if (!is.character(glass.control) || length(glass.control) != 1)
       stop("glass.control must be a character vector of length 1.")
 
