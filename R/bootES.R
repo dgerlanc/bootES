@@ -22,15 +22,11 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   ##   R             : the number of bootstrap 'repetitions' to perform
   ##   data.col      : The column in 'dat' containing the sample values
   ##   grp.col       : The column in 'dat' containing the grouping info
-  ##   stat          : The statistic to calculate
   ##   effect.type   : The type of standardization to perform
   ##   contrasts     : A named vector specifying the lambdas for different
-  ##                   groups in 'dat'. The default applies to the simplest,
-  ##                   2-group unweighted case
-  ##                   
+  ##                   groups in 'dat'
   ##   glass.control : The group for which the standard deviation should
   ##                   be used, eg. "glass.control='A'"
-  ##     
   ##   scale.weights : TRUE/FALSE, scale the lambdas to [-1, 1]
   ##   ci.type       : The type of confidence interval to generate
   ##                   (see 'boot.ci')
