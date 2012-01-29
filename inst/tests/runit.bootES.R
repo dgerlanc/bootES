@@ -162,6 +162,9 @@ test.bootES.contrast <- function() {
 }
 
 test.bootES.verbose <- function() {
+  path = system.file("gender.csv", package="bootES")
+  gender = read.csv(path, strip.white=TRUE, header=TRUE)
+  
   ## Test the verbosity of bootES functions
   g1 = c(11, 12, 13, 14, 15)
   g2 = c(26, 27, 28, 29)
@@ -170,7 +173,7 @@ test.bootES.verbose <- function() {
   grpLabels = rep(c("A", "B", "C"), times=c(length(g1), length(g2), length(g3)))
   threeGps  = data.frame(grpLabels, scores=c(g1, g2, g3))
   threeGpsVec = c(g1, g2, g3)
-  lambdas   = c(A=-1, B=2, C=-1)
+  lambdas   = c(A=-1, B=0, C=1)
 
   ## It shouldn't print anything to the screen.
   test = capture.output(assign("mean.res", bootES(threeGps,
@@ -184,6 +187,16 @@ test.bootES.verbose <- function() {
   
   checkTrue(grepl(" +Stat +CI \\(Low\\) +CI \\(High\\)", test[2], perl=TRUE))
   checkTrue(grepl("\\[1,\\] [\\d.]+ +[\\d.]+ +[\\d.]+", test[3], perl=TRUE))
+
+  ## It should print the statistic and the confidence interval to the screen
+  test = capture.output(assign("mean.res", bootES(gender, data.col="Meas3",
+    grp.col="Condition", contrasts = c(A = -40, B = -10, C = 50),
+    scale.weights=TRUE, verbose=1)))
+  
+  checkTrue(grepl("User-specified lambdas: \\(-?\\d+, -?\\d+, -?\\d+\\)", 
+                  test[1], perl=TRUE))
+  regexp = paste("Scaled lambdas: \\(-?[0-9.]+, -?[0-9.]+, -?[0-9.]+\\)")
+  checkTrue(grepl(regexp, test[2], perl=TRUE))
 }
 
 
