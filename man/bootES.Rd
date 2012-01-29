@@ -5,11 +5,12 @@
   Provides an interface to various methods for calculating effect sizes using the 'boot' package.
 }
 \usage{
-bootES(dat, R, data.col, grp.col, 
-       effect.type = c("unstandardized", "cohens.d", "hedges.g", "cohens.d.sigma", "r"),
+bootES(dat, R=1000, data.col=NULL, grp.col=NULL, 
+       effect.type = c("unstandardized", "cohens.d", "hedges.g",
+                       "cohens.d.sigma", "r", "slope"),
        contrasts = NULL,
        glass.control = NULL,
-       scale.weights = FALSE,
+       scale.weights = TRUE,
        ci.type = c("bca", "norm", "basic", "stud", "perc", "all", "none"),
        ci.conf = 0.95,
        verbose = 0)   
