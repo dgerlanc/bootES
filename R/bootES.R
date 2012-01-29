@@ -93,6 +93,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   
   ## Check and extract contrasts.
   lmbds = NULL
+  lmbds.orig = contrasts
   if (!is.null(contrasts)) {
     if (is.null(names(contrasts)))
       stop("'contrasts' must be a named vector")
@@ -222,6 +223,8 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   res[["ci.type"]] = ci.type
   res[["ci.conf"]] = ci.conf
   res[["verbose"]] = verbose
+  res[["contrasts"]] = lmbds.orig
+  res[["contrasts.scaled"]] = lmbds
   class(res) = c("bootES", "boot")
   
   if (verbose > 0L)
@@ -248,6 +251,16 @@ printTerse <- function(x) {
   ## confidence level, the type of confidence interval, the statistic, and the
   ## calculated CI bounds
   stopifnot(inherits(x, "bootES"))
+
+  ## Print the scaled and unscaled contrasts.
+  if (!is.null(x$contrasts)) {
+    cat(sprintf("User-specified lambdas: (%s)\n",
+                paste(x$contrasts, collapse=", ")))
+  }
+  if (!is.null(x$contrasts.scaled)) {
+    cat(sprintf("Scaled lambdas: (%s)\n",
+                paste(x$contrasts.scaled, collapse=", ")))
+  }
   
   ## Extract the confidence interval
   ci.type = x[["ci.type"]]
