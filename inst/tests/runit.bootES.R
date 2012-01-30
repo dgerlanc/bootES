@@ -1,9 +1,14 @@
 ## Daniel Gerlanc and Kris Kirby (2010)
 ## Input and regression tests for the bootES function
 
-test.bootES.input <- function() {
-  ## Test the functioning of the bootES interface w/ invalid inputs.
+test.AAA <- function() {
+  gender <<- read.csv(system.file("gender.csv", package="bootES"),
+                      strip.white=TRUE, header=TRUE)
+}
 
+test.bootES.input <- function() {
+  ## Test the functioning of the bootES interface w/ invalid inputs.  
+  
   g1 = c(11, 12, 13, 14, 15)
   g2 = c(26, 27, 28, 29)
   g3 = c(17, 18, 19, 20, 21, 22, 23)
@@ -16,6 +21,12 @@ test.bootES.input <- function() {
   ## Pass a non-data.frame object as 'dat'
   res = try(bootES("foo"), silent=TRUE)
   checkTrue(grepl("'dat' must be a data.frame or numeric vector.", res))
+
+  ## Pass an invalid 'group' to 'contrasts'
+  res = try(bootES(gender, data.col="Meas3",
+    grp.col="Condition", contrasts = c(Fake = -40, C = 50),
+    scale.weights=TRUE, verbose=0), silent=TRUE)
+  checkTrue(grepl("'Fake' is/are not valid groups.", res[1]))
   
   ## Pass a data.frame to 'dat' with no records
   checkException(bootES(data.frame()), silent=TRUE)
@@ -132,9 +143,6 @@ test.bootES.multivariate <- function() {
 
 test.bootES.contrast <- function() {
 
-  path = system.file("gender.csv", package="bootES")
-  gender = read.csv(path, strip.white=TRUE, header=TRUE)
-  
   ## Assert: Calculated value matches known value for an unstandardized
   ## contrast
   set.seed(1)
@@ -153,17 +161,15 @@ test.bootES.contrast <- function() {
 
   ## Assert: Calculated value matches known value for an unstandardized
   ## contrast with weights scaled and a group left out
-  ## set.seed(1)
-  ## truth.contrast.omit = -10.4486
-  ## test  = bootES(gender, data.col="Meas3", grp.col="Condition",
-  ##   contrasts = c(A = -1, C = 1))
-  ## checkEquals(truth.contrast.scaled, test$t0, tol=1e-4)
+  set.seed(1)
+  truth.contrast.omit = -3.0535
+  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+    contrasts = c(A = -1, C = 1))
+  checkEquals(truth.contrast.omit, test$t0, tol=1e-4)
   
 }
 
 test.bootES.verbose <- function() {
-  path = system.file("gender.csv", package="bootES")
-  gender = read.csv(path, strip.white=TRUE, header=TRUE)
   
   ## Test the verbosity of bootES functions
   g1 = c(11, 12, 13, 14, 15)

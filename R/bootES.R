@@ -50,6 +50,8 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   if (!(is.data.frame(dat) || is.numeric(dat)))
     stop("'dat' must be a data.frame or numeric vector.")
 
+  ## If 'dat' has been passed as a numeric vector, save it as a data.frame
+  ## with a data.col='scores'
   if (is.numeric(dat)) {
       dat      = data.frame(scores=dat, row.names=NULL)
       data.col = "scores"
@@ -104,14 +106,24 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
     lmbds = contrasts
     
     ## Scale contrasts if specified and not using the slope function
-    if (scale.weights && effect.type != "slope")
+    scale.lambdas = scale.weights && effect.type != "slope"
+    if (scale.lambdas)
       lmbds = scaleLambdasBySide(lmbds)    
     
-    ## Check that there are no NA lambdas.
-    na.lmbds = is.na(lmbds)
-    no.lmbds = sort(unique(grps[na.lmbds]))
-    if (any(na.lmbds))
-      stop(paste(sQuote(no.lmbds), collapse=", "), " have missing lambdas.")
+    ## Assert that there are no NA lambdas, then subset 'dat' to the groups for
+    ## which contrasts were provided.
+    lmbds.exist   = names(lmbds) %in% grps
+    missing.lmbds = names(lmbds)[!lmbds.exist]
+        
+    if (length(missing.lmbds))
+      stop(paste("'", missing.lmbds, "'", sep="", collapse=", "),
+           " is/are not valid groups.")
+    
+    boot.groups = unique(names(lmbds))
+    dat  = dat[dat[[grp.col]] %in% boot.groups, ]
+
+    vals = dat[[data.col]]
+    grps = as.factor(dat[[grp.col]])
   }
 
   ## Determine the 'stat' based on the passed arguments
