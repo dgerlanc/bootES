@@ -138,15 +138,22 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
 
   ## Error handling for the stat='cor.diff'
   if (stat == "cor.diff") {
-    is.valid = is.numeric(dat[[1]]) && is.numeric(dat[[2]])
-    if (!is.valid)
-      stop("'The first two columns of 'dat' must be numeric.'")
-
     if (is.null(grp.col))
       stop("You must specify a grouping column.")
-    
+
     if (length(unique(grps)) != 2)
       stop("There must be only 2 distinct groups!")
+
+    ## Assert that there are 2 numeric columns and reorder these
+    ## to be the first 2 columns in the data frame
+    num.col.idx = which(sapply(dat, is.numeric))
+    num.col.idx = num.col.idx[!names(num.col.idx) %in% grp.col]    
+    is.valid = length(num.col.idx) == 2
+    if (!is.valid)
+      stop("'dat' must contain 2 numeric columns and a grouping column.")
+    
+    grp.col.idx = match(grp.col, names(dat))
+    dat = dat[, c(num.col.idx, grp.col.idx)]
   }
   
   ## Error handling for slope argument
