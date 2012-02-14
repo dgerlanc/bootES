@@ -130,15 +130,7 @@ test.bootES.multivariate <- function() {
   truth     = with(twoGps, cor(g1, g2))
   cor.res   = bootES(twoGps, R=10, effect.type="r")
   checkEquals(truth, cor.res$t0)
-
-  ## Integration test of stat='cor.diff'
-  set.seed(1)
-  a1 = c(1:5, -(1:5))
-  a2 = c(10:14, 10:14)
-  twoGps       = data.frame(a1, a2, group=rep(c(1, 2), each=5))
-  truth        = cor(a1[1:5], a2[1:5]) - cor(a1[6:10], a2[6:10])
-  cor.diff.res = bootES(twoGps, R=10, grp.col="group", effect.type="r")
-  checkEquals(truth, cor.diff.res$t0)
+  
 }
 
 test.bootES.contrast <- function() {
@@ -167,6 +159,28 @@ test.bootES.contrast <- function() {
     contrasts = c(A = -1, C = 1))
   checkEquals(truth.contrast.omit, test$t0, tol=1e-4)
   
+}
+
+test.bootES.cor.diff <- function() {
+  ## Integration test of stat='cor.diff'
+  ## Note: Tests variable ordering of numberic and group columns.
+  set.seed(1)
+  a1 = c(1:5, -(1:5))
+  a2 = c(10:14, 10:14)
+  twoGps       = data.frame(group=rep(c(1, 2), each=5), a1, a2)
+  truth        = cor(a1[1:5], a2[1:5]) - cor(a1[6:10], a2[6:10])
+  cor.diff.res = bootES(twoGps, R=10, grp.col="group", effect.type="r")
+  checkEquals(truth, cor.diff.res$t0)
+}
+
+test.bootES.slope <- function() {
+  ## Regression test for when effect.type='slope'
+  set.seed(1)
+  truth <- -0.1244
+  test  <- bootES(gender, data.col="Meas3", grp.col="Condition",
+                  effect.type="slope",
+                  slope.levels=c(A=30, B=60, C=120))
+  checkEquals(truth, test$t0, tol=1e-2)
 }
 
 test.bootES.verbose <- function() {

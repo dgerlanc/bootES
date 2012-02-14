@@ -4,7 +4,8 @@
 bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r", "slope"),
-                   contrasts=NULL,                   
+                   contrasts=NULL,
+                   slope.levels=NULL,
                    glass.control=NULL,
                    scale.weights=TRUE,
                    ci.type=c("bca", "norm", "basic", "stud", "perc",
@@ -24,6 +25,8 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   ##   grp.col       : The column in 'dat' containing the grouping info
   ##   effect.type   : The type of standardization to perform
   ##   contrasts     : A named vector specifying the lambdas for different
+  ##                   groups in 'dat'
+  ##   slope.levels  : A named vector specifying the levels for different
   ##                   groups in 'dat'
   ##   glass.control : The group for which the standard deviation should
   ##                   be used, eg. "glass.control='A'"
@@ -92,10 +95,47 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   ## Checks on scale.weights
   if (!is.logical(scale.weights) || length(scale.weights) != 1)
     stop("'scale.weights' must be a logical vector of length 1.")
-  
-  ## Check and extract contrasts.
+
+  ## Process arguments for slope calculations
   lmbds = NULL
   lmbds.orig = contrasts
+  if (effect.type == "slope") {
+    if (is.null(vals))
+      stop("Invalid 'data.col'.")
+    
+    if (is.null(grps))
+      stop("Invalid 'grp.col'")
+    
+    if (is.null(slope.levels))
+      stop("Must specify 'slope.levels'.")
+
+    if (!is.null(contrasts))
+      stop("Cannot specify 'contrasts' and 'slope.levels'")
+    
+    invalid.levels <- !is.numeric(slope.levels) || is.null(names(slope.levels))
+    if (invalid.levels)
+      stop("'slope.levels' must be a named numeric vector.")
+    
+    lmbds <- calcSlopeLambdas(slope.levels)
+
+    ## Assert that there are no NA slopes, then subset 'dat' to the groups for
+    ## which slope.levels were provided.
+    lmbds.exist   = names(lmbds) %in% grps
+    missing.lmbds = names(lmbds)[!lmbds.exist]
+        
+    if (length(missing.lmbds))
+      stop(paste("'", missing.lmbds, "'", sep="", collapse=", "),
+           " is/are not valid groups.")
+    
+    boot.groups = unique(names(lmbds))
+    dat  = dat[dat[[grp.col]] %in% boot.groups, ]
+
+    grps = as.factor(dat[[grp.col]])
+    vals = dat[[data.col]]
+  }
+
+  
+  ## Check and extract contrasts.  
   if (!is.null(contrasts)) {
     if (is.null(names(contrasts)))
       stop("'contrasts' must be a named vector")
@@ -154,33 +194,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
     
     grp.col.idx = match(grp.col, names(dat))
     dat = dat[, c(num.col.idx, grp.col.idx)]
-  }
-  
-  ## Error handling for slope argument
-  if (stat == "slope") {
-    if (is.null(vals))
-      stop("Invalid data column.")
-      
-    if (is.null(grps))
-      stop("Invalid grouping column.")
-
-    if (!is.numeric(grps)) {
-      err.msg <- paste("If data in group column is not numeric, a numeric",
-                       "'contrasts' argument with names corresponding to the",
-                       "values in the 'grp.col' must be provided.",
-                       collapse=" ")
-      if (!is.numeric(contrasts)) 
-        stop(err.msg)
-
-      if (!all(names(contrasts) %in% grps))
-        stop(err.msg)
-    } else {
-      contrasts = NULL
-    }
-    
-    if (length(unique(grps)) < 2)
-      stop("There must be at least 2 distinct groups!")
-  }
+  }    
   
   ## Error handling for 'glass.control'
   if (!is.null(glass.control)) {
@@ -218,8 +232,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
     } else if (stat == "cor.diff") {
       res = boot(dat, calcBootCorDiff, R=R, stype="f", strata=grps, grps=grps)
     } else if (stat == "slope") {      
-      lmbds = calcSlopeLambdas(vals, grps, contrasts)
-      res   = boot(vals, calcUnstandardizedMean, R=R, stype="f", strata=grps,
+      res = boot(vals, calcSlope, R=R, stype="f", strata=grps,
         grps=grps, lambdas=lmbds)
     } else if (stat == "mean" && effect.type == "unstandardized") {
       res = boot(vals, meanUnweightedBoot, R, stype="f", strata=grps, grps=grps)
@@ -258,8 +271,9 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
 print.bootES <- function(x, ...) {
     ## Prints the bootstrap summary statistics for a bootES object, followed by
     ## the confidence interval if the user required its calculation.
-    class(x) <- "boot"            
-    boot:::print.boot(x)
+    class(x) <- "boot"
+    if (x$verbose > 1)
+      boot:::print.boot(x)
     cat("\n")
     if (x[["ci.type"]] != "none")
       print(boot.ci(x, conf=x[["ci.conf"]], type=x[["ci.type"]]))
@@ -311,6 +325,7 @@ determineStat <- function(dat,
   ##
   ## Args:
   ##  dat:
+  ##  data.col
   ##  grps:
   ##  effect.type:
   ##  contrasts:
@@ -325,9 +340,7 @@ determineStat <- function(dat,
     ## - data.col == NULL -> cor
     ## - r -> r
     ## - otherwise -> mean
-    if (identical(effect.type, 'slope')) {
-      res = 'slope'
-    } else if (is.null(data.col) && do.cor) {
+    if (is.null(data.col) && do.cor) {
       res = 'cor'
     } else if (identical(effect.type, 'r')) {
       res = 'r'
@@ -335,7 +348,9 @@ determineStat <- function(dat,
       res = 'mean'
     }
   } else { 
-    if (!is.null(contrasts)) {
+    if (identical(effect.type, 'slope')) {
+      res = 'slope'
+    } else if (!is.null(contrasts)) {
       res = 'contrast'
     } else {
       if (is.numeric(dat)) {

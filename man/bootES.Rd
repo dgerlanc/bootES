@@ -9,6 +9,7 @@ bootES(dat, R=1000, data.col=NULL, grp.col=NULL,
        effect.type = c("unstandardized", "cohens.d", "hedges.g",
                        "cohens.d.sigma", "r", "slope"),
        contrasts = NULL,
+       slope.level = NULL,
        glass.control = NULL,
        scale.weights = TRUE,
        ci.type = c("bca", "norm", "basic", "stud", "perc", "all", "none"),
@@ -24,7 +25,9 @@ bootES(dat, R=1000, data.col=NULL, grp.col=NULL,
   \item{data.col}{the name of the column in \code{dat} containing the sample values}
   \item{grp.col}{the name of the column in \code{dat} containing the grouping info}
   \item{effect.type}{The unit to report the statistic in}
-  \item{contrasts}{An optional vector of contrast weights}
+  \item{contrasts}{A named vector of between-group contrast weights}
+  \item{slope.weights}{A named vector of values corresponding to the
+    treatment levels for groups}
   \item{glass.control}{An optional name of a control group to use}
   \item{scale.weights}{TRUE/FALSE, scale the lambdas to [-1, 1]}
   \item{ci.type}{The method to use in constructing the confidence
@@ -36,15 +39,6 @@ bootES(dat, R=1000, data.col=NULL, grp.col=NULL,
     interval. When 2, outputs all the output from 1 plus diagnostic plots.}
 }
 
-\details{Fill this in...}
-
 \value{An object of class \code{bootES}}
 \author{Daniel Gerlanc and Kris Kirby}
 
-\examples{
-
-  
-
-  
-  
-}

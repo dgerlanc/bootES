@@ -25,8 +25,11 @@ test.determineStat <- function() {
 
   ## 1.2.r One Group, Two Measures on Two Different Dependent Variables
   ## Assert: stat is slope
-  test.input = data.frame(x=c(g1, g2), y=c(-g1, -g2))
-  test.result = bootES:::determineStat(test.input, effect.type='slope')
+  test.input  <- data.frame(x=c(g1, g2), y=c(-g1, -g2))
+  test.result <- bootES:::determineStat(test.input,
+                                        data.col=test.input$x,
+                                        grps=test.input$y,
+                                        effect.type='slope')
   checkEquals(test.result, 'slope')
       
   ## Assert: stat is contrast

@@ -28,3 +28,13 @@ test.scaleLambdasBySide <- function() {
   checkEquals(res5, x5)
   
 }
+
+test.calcSlopeLambdas <- function() {
+  ## Regression test for calcSlopeLambdas
+
+  ## Simplest Case
+  x1    <- c(A=30, B=60, C=120)
+  truth <- c(A=-0.0095, B=-0.0023, C=0.0119)
+  res   <- bootES:::calcSlopeLambdas(x1)
+  checkEquals(res, truth, tolerance=1e-2)
+}
