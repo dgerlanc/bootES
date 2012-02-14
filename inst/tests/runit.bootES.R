@@ -24,7 +24,7 @@ test.bootES.input <- function() {
 
   ## Pass an invalid 'group' to 'contrasts'
   res = try(bootES(gender, data.col="Meas3",
-    grp.col="Condition", contrasts = c(Fake = -40, C = 50),
+    grp.col="Condition", contrasts = c(Fake = -50, C = 50),
     scale.weights=TRUE, verbose=0), silent=TRUE)
   checkTrue(grepl("'Fake' is/are not valid groups.", res[1]))
   

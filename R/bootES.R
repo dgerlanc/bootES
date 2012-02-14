@@ -144,6 +144,10 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
       stop("Must specify a 'grp.col' when providing a 'contrasts' argument.")
 
     lmbds = contrasts
+
+    ## Assert that contrasts sum to 0
+    if (!isTRUE(all.equal(sum(lmbds), 0, tol=1e-2)))
+      stop("'contrasts' must sum to 0.")
     
     ## Scale contrasts if specified and not using the slope function
     scale.lambdas = scale.weights && effect.type != "slope"
