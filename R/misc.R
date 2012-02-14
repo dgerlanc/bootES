@@ -1,23 +1,23 @@
 ## Daniel Gerlanc and Kris Kirby (2010)
 ## Miscellaneous helper functions
 
-calcSlopeLambdas <- function(vals, grps, contrasts) {
-  ## Calculates the weights to use for a slope calculation
+calcSlopeLambdas <- function(slope.levels) {
+  ## Converts unit measures into contrasts for calculating slope
   ##
   ## Args:
-  ##   vals: a numeric vector
-  ##   grps: a numeric, character, or factor vector of groups
-  ##   contrasts: a named, numeric vector mapping 'grps' to predictor values
-  ##              otherwise NULL
+  ##   slope.levels: a named numeric vector of slope levels
   ##
   ## Returns:
-  ##  a vector of weights
+  ##  a named vector of scaled lambdas
+
+  if (!is.numeric(slope.levels))
+    stop("'slope.levels' must be numeric.")
+
+  if (is.null(names(slope.levels)))
+    stop("'slope.levels' must have names.")
   
-  avgs = c(tapply(vals, grps, mean))
-  preds <- if (is.numeric(contrasts))
-    contrasts[names(avgs)] else as.numeric(names(avgs))
-  ss    = sum((preds - avgs)^2)
-  lmbds = (preds - avgs) / ss
+  avg = mean(slope.levels)
+  lmbds = (slope.levels - avg) / sum((slope.levels - avg)^2)
 }
 
 scaleLambdasBySide <- function(lambdas) {
