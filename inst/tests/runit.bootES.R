@@ -221,4 +221,30 @@ test.bootES.output <- function() {
   checkTrue(grepl(regexp, test[2], perl=TRUE))
 }
 
+test.bootES.citype <- function() {
+  g1 = c(11, 12, 13, 14, 15)
+  g2 = c(26, 27, 28, 29)
+  g3 = c(17, 18, 19, 20, 21, 22, 23)
+  
+  grpLabels = rep(c("A", "B", "C"), times=c(length(g1), length(g2), length(g3)))
+  threeGps  = data.frame(grpLabels, scores=c(g1, g2, g3))
+  threeGpsVec = c(g1, g2, g3)
+  lambdas   = c(A=-1, B=2, C=-1)
+  
+  ## Test: 'meanBoot' through 'bootES'
+  set.seed(1)
+  truth    = mean(threeGps$scores)
+  mean.res = bootES(threeGps, R=1000, data.col="scores",
+    effect.type="unstandardized")
+  mean.res.vec = bootES(threeGpsVec, effect.type="unstandardized")
+  checkEquals(truth, mean.res$t0)
+  checkEquals(truth, mean.res.vec$t0)
 
+  ci.types = eval(formals(bootES)$ci.type)
+  for (aci in ci.types) {
+    set.seed(1)
+    . <- capture.output(print(bootES(threeGps, R=1000, data.col="scores",
+                                    effect.type="unstandardized", ci.type=aci)))
+  }
+  
+}

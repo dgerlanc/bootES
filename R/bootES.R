@@ -8,8 +8,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
                    slope.levels=NULL,
                    glass.control=NULL,
                    scale.weights=TRUE,
-                   ci.type=c("bca", "norm", "basic", "stud", "perc",
-                     "all", "none"),
+                   ci.type=c("bca", "norm", "basic", "perc", "none"),
                    ci.conf=0.95,
                    plot=FALSE) {
 
@@ -287,14 +286,16 @@ printTerse <- function(x) {
   
   ## Extract the confidence interval
   ci.type = x[["ci.type"]]
-  ci = boot.ci(x, conf=x[["ci.conf"]], type=ci.type)
-  ci = ci[[ci.type, exact=FALSE]]
+  if (ci.type != "none") {
+    ci = boot.ci(x, conf=x[["ci.conf"]], type=ci.type)
+    ci = ci[[ci.type, exact=FALSE]]
 
-  bounds = switch(ci.type,
-    bca   = ci[1, 4:5, drop=TRUE],
-    norm  = ci[1, 2:3, drop=TRUE],
-    all   = ci[["bca"]][1, 4:5, drop=TRUE],
-    ci)
+    bounds = switch(ci.type,
+      norm  = ci[1, 2:3, drop=TRUE],
+      ci[1, 4:5, drop=TRUE])
+  } else {
+    bounds = c(NA_real_, NA_real_)
+  }
 
   ## BEGIN: Code from boot::print.boot
   index  = seq_len(ncol(x$t))

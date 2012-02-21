@@ -13,7 +13,7 @@ bootES(dat, R=1000, data.col=NULL, grp.col=NULL,
        slope.level = NULL,
        glass.control = NULL,
        scale.weights = TRUE,
-       ci.type = c("bca", "norm", "basic", "stud", "perc", "all", "none"),
+       ci.type = c("bca", "norm", "basic", "perc", "none"),
        ci.conf = 0.95,
        plot = FALSE)   
 }
