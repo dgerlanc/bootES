@@ -11,7 +11,8 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
                    ci.type=c("bca", "norm", "basic", "stud", "perc",
                      "all", "none"),
                    ci.conf=0.95,
-                   verbose=0) {
+                   plot=FALSE) {
+
   
   ## Performs different variants of bootstrap analyses for calculating
   ## effect sizes.
@@ -34,7 +35,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   ##   ci.type       : The type of confidence interval to generate
   ##                   (see 'boot.ci')
   ##   ci.conf       : The confidence level of the interval
-  ##   verbose       : Higher levels generate more output
+  ##   verbose       : Generate the plot?
   ##
   ## Returns:
   ##   An object of class 'bootES' and 'boot'
@@ -209,11 +210,6 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
       stop("'glass.control' missing from 'dat'")
   }  
 
-  ## Error handling for 'verbose'
-  verbose = as.integer(verbose)
-  if (!verbose %in% 0:2)
-    stop("'verbose' must be 0, 1, or 2.")
-  
   ## Simplest Case: No groups, so we can calculate all of the stats for a single
   ## group
   n.grps = length(unique(grps))
@@ -258,29 +254,19 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
 
   res[["ci.type"]] = ci.type
   res[["ci.conf"]] = ci.conf
-  res[["verbose"]] = verbose
   res[["contrasts"]] = lmbds.orig
   res[["contrasts.scaled"]] = lmbds
   class(res) = c("bootES", "boot")
-  
-  if (verbose > 0L)
-    printTerse(res)
-
-  if (verbose > 1L)
-    plot(res)
   
   return(res)
 }
 
 print.bootES <- function(x, ...) {
-    ## Prints the bootstrap summary statistics for a bootES object, followed by
-    ## the confidence interval if the user required its calculation.
-    class(x) <- "boot"
-    if (x$verbose > 1)
-      boot:::print.boot(x)
-    cat("\n")
-    if (x[["ci.type"]] != "none")
-      print(boot.ci(x, conf=x[["ci.conf"]], type=x[["ci.type"]]))
+  ## Prints the bootstrap summary statistics for a bootES object, followed by
+  ## the confidence interval if the user required its calculation.
+  printTerse(x)
+  if (isTRUE(x$plot))
+    plot(x)
 }
 
 printTerse <- function(x) {
@@ -301,7 +287,6 @@ printTerse <- function(x) {
   
   ## Extract the confidence interval
   ci.type = x[["ci.type"]]
-  stat = x[["t0"]]
   ci = boot.ci(x, conf=x[["ci.conf"]], type=ci.type)
   ci = ci[[ci.type, exact=FALSE]]
 
@@ -311,10 +296,27 @@ printTerse <- function(x) {
     all   = ci[["bca"]][1, 4:5, drop=TRUE],
     ci)
 
-  nms = c("Stat", "CI (Low)", "CI (High)")
-  res = matrix(c(stat, bounds), nrow=1, dimnames=list(NULL, nms))
+  ## BEGIN: Code from boot::print.boot
+  index  = seq_len(ncol(x$t))
+  t      = matrix(x$t[, index], nrow = nrow(x$t))
+  allNA  = apply(t, 2L, function(t) all(is.na(t)))
+  ind1   = index[allNA]
+  index  = index[!allNA]
+  t      = matrix(t[, !allNA], nrow = nrow(t))
+  t0     = x$t0
 
-  cat(sprintf("%.2f%% %s Confidence Interval\n", 100 * x[["ci.conf"]], ci.type))
+  bias = apply(t, 2L, mean, na.rm=TRUE) - t0
+  std.error = sqrt(apply(t, 2L, function(t.st) var(t.st[!is.na(t.st)])))
+  ## END: Code from boot::print.boot
+  
+  nms = c("Stat", "CI (Low)", "CI (High)", "bias", "std. error")
+  res = matrix(c(t0, bounds, bias, std.error),
+               nrow=1, dimnames=list(NULL, nms))
+
+  cat(sprintf("%.2f%% %s Confidence Interval, %d replicates\n",
+              100 * x[["ci.conf"]],
+              ci.type,
+              x[["R"]]))
   print(res)
   cat("\n")
 }

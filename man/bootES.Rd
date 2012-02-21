@@ -2,7 +2,8 @@
 \alias{bootES}
 \title{bootES}
 \description{
-  Provides an interface to various methods for calculating effect sizes using the 'boot' package.
+  Provides an interface to various methods for calculating effect sizes
+  using the 'boot' package.
 }
 \usage{
 bootES(dat, R=1000, data.col=NULL, grp.col=NULL, 
@@ -14,7 +15,7 @@ bootES(dat, R=1000, data.col=NULL, grp.col=NULL,
        scale.weights = TRUE,
        ci.type = c("bca", "norm", "basic", "stud", "perc", "all", "none"),
        ci.conf = 0.95,
-       verbose = 0)   
+       plot = FALSE)   
 }
 
 \arguments{
@@ -33,10 +34,8 @@ bootES(dat, R=1000, data.col=NULL, grp.col=NULL,
   \item{ci.type}{The method to use in constructing the confidence
     interval.}
   \item{ci.conf}{The confidence level for the confidence interval.}
-  \item{verbose}{The amount of output the function generates as it
-    runs. May be 0, 1, or 2. When 0, calling 'bootES' does not produce
-    any output. When 1, outputs the statistic and confidence
-    interval. When 2, outputs all the output from 1 plus diagnostic plots.}
+  \item{plot}{Generate the histogram of the sample statistics and the
+    quantile-quantile plot on printing?}
 }
 
 \value{An object of class \code{bootES}}

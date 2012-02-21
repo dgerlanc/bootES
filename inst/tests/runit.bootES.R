@@ -25,7 +25,7 @@ test.bootES.input <- function() {
   ## Pass an invalid 'group' to 'contrasts'
   res = try(bootES(gender, data.col="Meas3",
     grp.col="Condition", contrasts = c(Fake = -50, C = 50),
-    scale.weights=TRUE, verbose=0), silent=TRUE)
+    scale.weights=TRUE), silent=TRUE)
   checkTrue(grepl("'Fake' is/are not valid groups.", res[1]))
   
   ## Pass a data.frame to 'dat' with no records
@@ -183,7 +183,7 @@ test.bootES.slope <- function() {
   checkEquals(truth, test$t0, tol=1e-2)
 }
 
-test.bootES.verbose <- function() {
+test.bootES.output <- function() {
   
   ## Test the verbosity of bootES functions
   g1 = c(11, 12, 13, 14, 15)
@@ -197,21 +197,23 @@ test.bootES.verbose <- function() {
 
   ## It shouldn't print anything to the screen.
   test = capture.output(assign("mean.res", bootES(threeGps,
-    data.col="scores", effect.type="unstandardized", verbose=0)))
+    data.col="scores", effect.type="unstandardized")))
 
   checkTrue(length(test) == 0)
   
-  ## It should print the statistic and the confidence interval to the screen
-  test = capture.output(assign("mean.res", bootES(threeGps,
-    data.col="scores", effect.type="unstandardized", verbose=1)))
+  ## Validate output
+  test = capture.output(print(bootES(threeGps,
+    data.col="scores", effect.type="unstandardized")))
   
-  checkTrue(grepl(" +Stat +CI \\(Low\\) +CI \\(High\\)", test[2], perl=TRUE))
-  checkTrue(grepl("\\[1,\\] [\\d.]+ +[\\d.]+ +[\\d.]+", test[3], perl=TRUE))
+  str1 = " +Stat +CI \\(Low\\) +CI \\(High\\) +bias +std\\. error"
+  checkTrue(grepl(str1, test[2], perl=TRUE))
+  str2 = "\\[1,\\] [\\d.]+ +[\\d.]+ +[\\d.]+ +[-\\d.]+ +[\\d.]+"
+  checkTrue(grepl(str2, test[3], perl=TRUE))
 
   ## It should print the statistic and the confidence interval to the screen
-  test = capture.output(assign("mean.res", bootES(gender, data.col="Meas3",
+  test = capture.output(print(bootES(gender, data.col="Meas3",
     grp.col="Condition", contrasts = c(A = -40, B = -10, C = 50),
-    scale.weights=TRUE, verbose=1)))
+    scale.weights=TRUE)))
   
   checkTrue(grepl("User-specified lambdas: \\(-?\\d+, -?\\d+, -?\\d+\\)", 
                   test[1], perl=TRUE))
