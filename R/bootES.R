@@ -1,7 +1,7 @@
 ## Daniel Gerlanc and Kris Kirby (2010)
 ## High-level function for bootstrap analyses using the 'boot' package
 
-bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
+bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r", "slope"),
                    contrasts=NULL,
@@ -22,7 +22,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
   ##                   and contrasts (optional) for each sample
   ##   R             : the number of bootstrap 'repetitions' to perform
   ##   data.col      : The column in 'dat' containing the sample values
-  ##   grp.col       : The column in 'dat' containing the grouping info
+  ##   group.col       : The column in 'dat' containing the grouping info
   ##   effect.type   : The type of standardization to perform
   ##   contrasts     : A named vector specifying the lambdas for different
   ##                   groups in 'dat'
@@ -80,16 +80,16 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
     vals = dat[[data.col]]
   }
   
-  ## Check and extract 'grp.col'.
+  ## Check and extract 'group.col'.
   grps = NULL
-  if (!is.null(grp.col)) {
-    if (!is.character(grp.col)) 
-      stop("'grp.col' must be a character vector.")
+  if (!is.null(group.col)) {
+    if (!is.character(group.col)) 
+      stop("'group.col' must be a character vector.")
     
-    if (!grp.col %in% colnames(dat))
-      stop("'grp.col' missing from 'dat'")
+    if (!group.col %in% colnames(dat))
+      stop("'group.col' missing from 'dat'")
     
-    grps = as.factor(dat[[grp.col]])
+    grps = as.factor(dat[[group.col]])
   }  
 
   ## Checks on scale.weights
@@ -104,7 +104,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
       stop("Invalid 'data.col'.")
     
     if (is.null(grps))
-      stop("Invalid 'grp.col'")
+      stop("Invalid 'group.col'")
     
     if (is.null(slope.levels))
       stop("Must specify 'slope.levels'.")
@@ -128,9 +128,9 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
            " is/are not valid groups.")
     
     boot.groups = unique(names(lmbds))
-    dat  = dat[dat[[grp.col]] %in% boot.groups, ]
+    dat  = dat[dat[[group.col]] %in% boot.groups, ]
 
-    grps = as.factor(dat[[grp.col]])
+    grps = as.factor(dat[[group.col]])
     vals = dat[[data.col]]
   }
 
@@ -140,8 +140,8 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
     if (is.null(names(contrasts)))
       stop("'contrasts' must be a named vector")
     
-    if (is.null(grp.col))
-      stop("Must specify a 'grp.col' when providing a 'contrasts' argument.")
+    if (is.null(group.col))
+      stop("Must specify a 'group.col' when providing a 'contrasts' argument.")
 
     lmbds = contrasts
 
@@ -164,10 +164,10 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
            " is/are not valid groups.")
     
     boot.groups = unique(names(lmbds))
-    dat  = dat[dat[[grp.col]] %in% boot.groups, ]
+    dat  = dat[dat[[group.col]] %in% boot.groups, ]
 
     vals = dat[[data.col]]
-    grps = as.factor(dat[[grp.col]])
+    grps = as.factor(dat[[group.col]])
   }
 
   ## Determine the 'stat' based on the passed arguments
@@ -182,7 +182,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
 
   ## Error handling for the stat='cor.diff'
   if (stat == "cor.diff") {
-    if (is.null(grp.col))
+    if (is.null(group.col))
       stop("You must specify a grouping column.")
 
     if (length(unique(grps)) != 2)
@@ -191,13 +191,13 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
     ## Assert that there are 2 numeric columns and reorder these
     ## to be the first 2 columns in the data frame
     num.col.idx = which(sapply(dat, is.numeric))
-    num.col.idx = num.col.idx[!names(num.col.idx) %in% grp.col]    
+    num.col.idx = num.col.idx[!names(num.col.idx) %in% group.col]    
     is.valid = length(num.col.idx) == 2
     if (!is.valid)
       stop("'dat' must contain 2 numeric columns and a grouping column.")
     
-    grp.col.idx = match(grp.col, names(dat))
-    dat = dat[, c(num.col.idx, grp.col.idx)]
+    group.col.idx = match(group.col, names(dat))
+    dat = dat[, c(num.col.idx, group.col.idx)]
   }    
   
   ## Error handling for 'glass.control'
@@ -243,7 +243,7 @@ bootES <- function(dat, R=1000, data.col=NULL, grp.col=NULL,
         lambdas=lmbds)
     } else {
       fmt = paste("effect.type: %s for a 'dat' of class '%s' of length %d",
-        "with data.col of class %s and grp.col of class %s not implemented.",
+        "with data.col of class %s and group.col of class %s not implemented.",
         collapse="")
       msg = sprintf(msg, effect.type, class(dat), length(dat), class(grps),
         class(vals))

@@ -24,7 +24,7 @@ test.bootES.input <- function() {
 
   ## Pass an invalid 'group' to 'contrasts'
   res = try(bootES(gender, data.col="Meas3",
-    grp.col="Condition", contrasts = c(Fake = -50, C = 50),
+    group.col="Condition", contrasts = c(Fake = -50, C = 50),
     scale.weights=TRUE), silent=TRUE)
   checkTrue(grepl("'Fake' is/are not valid groups.", res[1]))
   
@@ -112,13 +112,13 @@ test.bootES.multivariate <- function() {
   ## Integration test of stat='contrast' and effect.type='unstandardized'
   set.seed(1)
   truth     = mean(g1) - mean(g2)
-  unstdDiff.res = bootES(twoGpsA, R=1000, data.col="x", grp.col="team",
+  unstdDiff.res = bootES(twoGpsA, R=1000, data.col="x", group.col="team",
     effect.type="unstandardized", contrasts=lambdas)
   checkEquals(truth, unstdDiff.res$t0)  
   
   ## Integration test of stat='contrast' and effect.type='unstandardized' where
   ## there is only one group. This should cause an error.
-  unstdDiff.err = try(bootES(twoGpsErr, R=1000, data.col="x", grp.col="team",
+  unstdDiff.err = try(bootES(twoGpsErr, R=1000, data.col="x", group.col="team",
     effect.type="unstandardized"), silent=TRUE)    
   
   ## Integration test of stat='cor'
@@ -139,7 +139,7 @@ test.bootES.contrast <- function() {
   ## contrast
   set.seed(1)
   truth = -522.43
-  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+  test  = bootES(gender, data.col="Meas3", group.col="Condition",
     contrasts = c(A = -40, B = -10, C = 50), scale.weights=FALSE)
   checkEquals(truth, test$t0, tol=1e-2)
 
@@ -147,7 +147,7 @@ test.bootES.contrast <- function() {
   ## contrast with weights scaled
   set.seed(1)
   truth.contrast.scaled = -10.4486
-  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+  test  = bootES(gender, data.col="Meas3", group.col="Condition",
     contrasts = c(A = -40, B = -10, C = 50), scale.weights=TRUE)
   checkEquals(truth.contrast.scaled, test$t0, tol=1e-4)
 
@@ -155,7 +155,7 @@ test.bootES.contrast <- function() {
   ## contrast with weights scaled and a group left out
   set.seed(1)
   truth.contrast.omit = -3.0535
-  test  = bootES(gender, data.col="Meas3", grp.col="Condition",
+  test  = bootES(gender, data.col="Meas3", group.col="Condition",
     contrasts = c(A = -1, C = 1))
   checkEquals(truth.contrast.omit, test$t0, tol=1e-4)
   
@@ -169,7 +169,7 @@ test.bootES.cor.diff <- function() {
   a2 = c(10:14, 10:14)
   twoGps       = data.frame(group=rep(c(1, 2), each=5), a1, a2)
   truth        = cor(a1[1:5], a2[1:5]) - cor(a1[6:10], a2[6:10])
-  cor.diff.res = bootES(twoGps, R=10, grp.col="group", effect.type="r")
+  cor.diff.res = bootES(twoGps, R=10, group.col="group", effect.type="r")
   checkEquals(truth, cor.diff.res$t0)
 }
 
@@ -177,7 +177,7 @@ test.bootES.slope <- function() {
   ## Regression test for when effect.type='slope'
   set.seed(1)
   truth <- -0.1244
-  test  <- bootES(gender, data.col="Meas3", grp.col="Condition",
+  test  <- bootES(gender, data.col="Meas3", group.col="Condition",
                   effect.type="slope",
                   slope.levels=c(A=30, B=60, C=120))
   checkEquals(truth, test$t0, tol=1e-2)
@@ -212,7 +212,7 @@ test.bootES.output <- function() {
 
   ## It should print the statistic and the confidence interval to the screen
   test = capture.output(print(bootES(gender, data.col="Meas3",
-    grp.col="Condition", contrasts = c(A = -40, B = -10, C = 50),
+    group.col="Condition", contrasts = c(A = -40, B = -10, C = 50),
     scale.weights=TRUE)))
   
   checkTrue(grepl("User-specified lambdas: \\(-?\\d+, -?\\d+, -?\\d+\\)", 
