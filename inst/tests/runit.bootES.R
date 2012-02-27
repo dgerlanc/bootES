@@ -128,7 +128,7 @@ test.bootES.multivariate <- function() {
   twoGps    = data.frame(g1=g1)
   twoGps$g2 = rep(g2, length.out=nrow(twoGps))
   truth     = with(twoGps, cor(g1, g2))
-  cor.res   = bootES(twoGps, R=10, effect.type="r")
+  cor.res   = suppressWarnings(bootES(twoGps, R=10, effect.type="r"))
   checkEquals(truth, cor.res$t0)
   
 }
@@ -241,10 +241,16 @@ test.bootES.citype <- function() {
   checkEquals(truth, mean.res.vec$t0)
 
   ci.types = eval(formals(bootES)$ci.type)
-  for (aci in ci.types) {
+  ci.types = ci.types[!ci.types %in% "stud"]
+  for (ci.type in ci.types) {
     set.seed(1)
-    . <- capture.output(print(bootES(threeGps, R=1000, data.col="scores",
-                                    effect.type="unstandardized", ci.type=aci)))
+    if (ci.type == "stud") {
+      . <- bootES(threeGps, R=1000, data.col="scores",
+                  effect.type="unstandardized", ci.type=ci.type,
+                  var.t0=1, var.t=1)
+    } else {
+      . <- bootES(threeGps, R=1000, data.col="scores",
+                  effect.type="unstandardized", ci.type=ci.type)
+    }
   }
-  
 }

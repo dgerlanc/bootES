@@ -8,9 +8,10 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
                    slope.levels=NULL,
                    glass.control=NULL,
                    scale.weights=TRUE,
-                   ci.type=c("bca", "norm", "basic", "perc", "none"),
+                   ci.type=c("bca", "norm", "basic", "perc", "stud", "none"),
                    ci.conf=0.95,
-                   plot=FALSE) {
+                   plot=FALSE,
+                   ...) {
 
   
   ## Performs different variants of bootstrap analyses for calculating
@@ -251,6 +252,19 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     }
   }
 
+  ## Calculate the confidence interval
+  if (ci.type != "none") {
+    ci = boot.ci(res, conf=ci.conf, type=ci.type, ...)
+    ci = ci[[ci.type, exact=FALSE]]
+
+    bounds = switch(ci.type,
+      norm  = ci[1, 2:3, drop=TRUE],
+      ci[1, 4:5, drop=TRUE])
+  } else {
+    bounds = c(NA_real_, NA_real_)
+  }
+
+  res[["bounds"]]  = bounds
   res[["ci.type"]] = ci.type
   res[["ci.conf"]] = ci.conf
   res[["contrasts"]] = lmbds.orig
@@ -283,19 +297,6 @@ printTerse <- function(x) {
     cat(sprintf("Scaled lambdas: (%s)\n",
                 paste(x$contrasts.scaled, collapse=", ")))
   }
-  
-  ## Extract the confidence interval
-  ci.type = x[["ci.type"]]
-  if (ci.type != "none") {
-    ci = boot.ci(x, conf=x[["ci.conf"]], type=ci.type)
-    ci = ci[[ci.type, exact=FALSE]]
-
-    bounds = switch(ci.type,
-      norm  = ci[1, 2:3, drop=TRUE],
-      ci[1, 4:5, drop=TRUE])
-  } else {
-    bounds = c(NA_real_, NA_real_)
-  }
 
   ## BEGIN: Code from boot::print.boot
   index  = seq_len(ncol(x$t))
@@ -311,12 +312,12 @@ printTerse <- function(x) {
   ## END: Code from boot::print.boot
   
   nms = c("Stat", "CI (Low)", "CI (High)", "bias", "std. error")
-  res = matrix(c(t0, bounds, bias, std.error),
+  res = matrix(c(t0, x[["bounds"]], bias, std.error),
                nrow=1, dimnames=list(NULL, nms))
 
   cat(sprintf("%.2f%% %s Confidence Interval, %d replicates\n",
               100 * x[["ci.conf"]],
-              ci.type,
+              x[["ci.type"]],
               x[["R"]]))
   print(res)
   cat("\n")
