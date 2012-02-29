@@ -40,6 +40,17 @@ bootES(dat, R=1000, data.col=NULL, group.col=NULL,
   \item{...}{Additional arguments passed to \code{boot.ci}}
 }
 
-\value{An object of class \code{bootES}}
+\details{\code{bootES} provides a somewhat simpler interface to the
+  \code{boot} and \code{boot.ci} functions in the \code{boot} package
+  for calculating several common statistics. More complex and custom
+  bootstrap analyses may be done by using the \code{boot} function
+  directly.
+
+  In order to calculate studentized confidence intervals
+  (\code{ci.type="stud"}), the user must pass \code{var.t} and
+  \code{var.t0} arguments. See \code{boot.ci} for more information.
+}
+
+\value{An object of class \code{c('bootES', 'boot')}}
 \author{Daniel Gerlanc and Kris Kirby}
 

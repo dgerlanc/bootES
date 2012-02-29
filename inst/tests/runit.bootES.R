@@ -156,9 +156,13 @@ test.bootES.contrast <- function() {
   set.seed(1)
   truth.contrast.omit = -3.0535
   test  = bootES(gender, data.col="Meas3", group.col="Condition",
-    contrasts = c(A = -1, C = 1))
+    contrasts = c(A = -1, C = 1))  
   checkEquals(truth.contrast.omit, test$t0, tol=1e-4)
-  
+
+  ## Assert: Default weights of -1 and 1 are used when not passed in
+  test.dflt  = bootES(gender, data.col="Meas3", group.col="Condition",
+    contrasts = c('A', 'C'))
+  checkEquals(truth.contrast.omit, test.dflt$t0, tol=1e-4)
 }
 
 test.bootES.cor.diff <- function() {

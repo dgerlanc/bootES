@@ -35,7 +35,8 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ##   ci.type       : The type of confidence interval to generate
   ##                   (see 'boot.ci')
   ##   ci.conf       : The confidence level of the interval
-  ##   verbose       : Generate the plot?
+  ##   plot          : Generate the plot?
+  ##   ...           : additional arguments passed to 'boot.ci'
   ##
   ## Returns:
   ##   An object of class 'bootES' and 'boot'
@@ -43,8 +44,6 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ## Details: If 'R' is not a whole number, it will be round down to the nearest
   ## whole number.  * stat=cor: 'dat' must be a two-column data frame, where
   ## each of the columns is numeric
-  ##
-  ## TODO: Parse, then evaluate the 'boot' call
 
   ## Error handling
   effect.type = match.arg(effect.type)
@@ -137,13 +136,17 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
 
   
   ## Check and extract contrasts.  
-  if (!is.null(contrasts)) {
+  if (!is.null(contrasts)) {            
+    use.default.contrasts = is.character(contrasts) && length(contrasts) == 2
+    if (use.default.contrasts)
+      contrasts = structure(c(-1, 1), names=contrasts)
+
     if (is.null(names(contrasts)))
       stop("'contrasts' must be a named vector")
-    
+
     if (is.null(group.col))
       stop("Must specify a 'group.col' when providing a 'contrasts' argument.")
-
+    
     lmbds = contrasts
 
     ## Assert that contrasts sum to 0
