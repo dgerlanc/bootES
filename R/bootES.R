@@ -267,6 +267,9 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     bounds = c(NA_real_, NA_real_)
   }
 
+  if (plot)
+    plot(res)
+
   res[["bounds"]]  = bounds
   res[["ci.type"]] = ci.type
   res[["ci.conf"]] = ci.conf
@@ -280,9 +283,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
 print.bootES <- function(x, ...) {
   ## Prints the bootstrap summary statistics for a bootES object, followed by
   ## the confidence interval if the user required its calculation.
-  printTerse(x)
-  if (isTRUE(x$plot))
-    plot(x)
+  printTerse(x)  
 }
 
 printTerse <- function(x) {
@@ -322,8 +323,9 @@ printTerse <- function(x) {
               100 * x[["ci.conf"]],
               x[["ci.type"]],
               x[["R"]]))
-  print(res)
-  cat("\n")
+  out = capture.output(print(res))
+  out = sub('[1,]', '   ', out, fixed=TRUE)
+  cat(out, "", sep="\n")
 }
 
 determineStat <- function(dat,

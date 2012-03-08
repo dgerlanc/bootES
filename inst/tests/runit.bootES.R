@@ -211,7 +211,7 @@ test.bootES.output <- function() {
   
   str1 = " +Stat +CI \\(Low\\) +CI \\(High\\) +bias +std\\. error"
   checkTrue(grepl(str1, test[2], perl=TRUE))
-  str2 = "\\[1,\\] [\\d.]+ +[\\d.]+ +[\\d.]+ +[-\\d.]+ +[\\d.]+"
+  str2 = " +[\\d.]+ +[\\d.]+ +[\\d.]+ +[-\\d.]+ +[\\d.]+"
   checkTrue(grepl(str2, test[3], perl=TRUE))
 
   ## It should print the statistic and the confidence interval to the screen
