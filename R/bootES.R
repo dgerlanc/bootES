@@ -294,12 +294,17 @@ printTerse <- function(x) {
 
   ## Print the scaled and unscaled contrast.
   if (!is.null(x$contrast)) {
+    lmbds.txt <- gsub(" +", "", formatC(x$contrast, digits=3, format="fg"))
     cat(sprintf("User-specified lambdas: (%s)\n",
-                paste(x$contrast, collapse=", ")))
+                paste(lmbds.txt, collapse=", ")))
+                      
   }
   if (!is.null(x$contrast.scaled)) {
+    lmbds.scl.txt <- gsub(" +", "",
+                      formatC(x$contrast.scaled, digits=3, format="fg"))
     cat(sprintf("Scaled lambdas: (%s)\n",
-                paste(x$contrast.scaled, collapse=", ")))
+                paste(lmbds.scl.txt, collapse=", ")))
+                      
   }
 
   ## BEGIN: Code from boot::print.boot
@@ -323,6 +328,10 @@ printTerse <- function(x) {
               100 * x[["ci.conf"]],
               x[["ci.type"]],
               x[["R"]]))
+
+  ## Print results w/ 3 digits to the right of the decimal point
+  out = res
+  out[, ] = sprintf("%.3f", res)
   out = capture.output(print(res))
   out = sub('[1,]', '   ', out, fixed=TRUE)
   cat(out, "", sep="\n")

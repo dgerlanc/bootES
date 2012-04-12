@@ -223,6 +223,18 @@ test.bootES.output <- function() {
                   test[1], perl=TRUE))
   regexp = paste("Scaled lambdas: \\(-?[0-9.]+, -?[0-9.]+, -?[0-9.]+\\)")
   checkTrue(grepl(regexp, test[2], perl=TRUE))
+
+  ## It should output to 3 significant digits for the user lambdas
+  test = capture.output(print(bootES(gender, data.col="Meas3",
+    group.col="Condition",
+    contrast = c(A = -0.33726, B = 0.27348, C = 0.06378),
+    scale.weights=TRUE)))
+
+  check.regexp = "-0.[0-9]{3,}, 0.[0-9]{3,}, 0.[0-9]{3,}"
+  checkTrue(grepl(check.regexp, test[1], perl=TRUE))
+                  
+  check.regexp = check.string = "1, 0.[0-9]{3,}, 0.[0-9]{3,}"
+  checkTrue(grepl(check.regexp, test[2], perl=TRUE))
 }
 
 test.bootES.citype <- function() {
