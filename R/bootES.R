@@ -4,7 +4,7 @@
 bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r", "slope"),
-                   contrasts=NULL,
+                   contrast=NULL,
                    slope.levels=NULL,
                    glass.control=NULL,
                    scale.weights=TRUE,
@@ -20,12 +20,12 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ## Args:
   ##   dat           : a vector or data frame containing the one or more
   ##                   columns of values (required), group labels (optional),
-  ##                   and contrasts (optional) for each sample
+  ##                   and contrast (optional) for each sample
   ##   R             : the number of bootstrap 'repetitions' to perform
   ##   data.col      : The column in 'dat' containing the sample values
   ##   group.col       : The column in 'dat' containing the grouping info
   ##   effect.type   : The type of standardization to perform
-  ##   contrasts     : A named vector specifying the lambdas for different
+  ##   contrast     : A named vector specifying the lambdas for different
   ##                   groups in 'dat'
   ##   slope.levels  : A named vector specifying the levels for different
   ##                   groups in 'dat'
@@ -98,7 +98,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
 
   ## Process arguments for slope calculations
   lmbds = NULL
-  lmbds.orig = contrasts
+  lmbds.orig = contrast
   if (effect.type == "slope") {
     if (is.null(vals))
       stop("Invalid 'data.col'.")
@@ -109,8 +109,8 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     if (is.null(slope.levels))
       stop("Must specify 'slope.levels'.")
 
-    if (!is.null(contrasts))
-      stop("Cannot specify 'contrasts' and 'slope.levels'")
+    if (!is.null(contrast))
+      stop("Cannot specify 'contrast' and 'slope.levels'")
     
     invalid.levels <- !is.numeric(slope.levels) || is.null(names(slope.levels))
     if (invalid.levels)
@@ -135,31 +135,31 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   }
 
   
-  ## Check and extract contrasts.  
-  if (!is.null(contrasts)) {            
-    use.default.contrasts = is.character(contrasts) && length(contrasts) == 2
-    if (use.default.contrasts)
-      contrasts = structure(c(-1, 1), names=contrasts)
+  ## Check and extract contrast.  
+  if (!is.null(contrast)) {            
+    use.default.contrast = is.character(contrast) && length(contrast) == 2
+    if (use.default.contrast)
+      contrast = structure(c(-1, 1), names=contrast)
 
-    if (is.null(names(contrasts)))
-      stop("'contrasts' must be a named vector")
+    if (is.null(names(contrast)))
+      stop("'contrast' must be a named vector")
 
     if (is.null(group.col))
-      stop("Must specify a 'group.col' when providing a 'contrasts' argument.")
+      stop("Must specify a 'group.col' when providing a 'contrast' argument.")
     
-    lmbds = contrasts
+    lmbds = contrast
 
-    ## Assert that contrasts sum to 0
+    ## Assert that contrast sum to 0
     if (!isTRUE(all.equal(sum(lmbds), 0, tol=1e-2)))
-      stop("'contrasts' must sum to 0.")
+      stop("'contrast' must sum to 0.")
     
-    ## Scale contrasts if specified and not using the slope function
+    ## Scale contrast if specified and not using the slope function
     scale.lambdas = scale.weights && effect.type != "slope"
     if (scale.lambdas)
       lmbds = scaleLambdasBySide(lmbds)    
     
     ## Assert that there are no NA lambdas, then subset 'dat' to the groups for
-    ## which contrasts were provided.
+    ## which contrast were provided.
     lmbds.exist   = names(lmbds) %in% grps
     missing.lmbds = names(lmbds)[!lmbds.exist]
         
@@ -273,8 +273,8 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   res[["bounds"]]  = bounds
   res[["ci.type"]] = ci.type
   res[["ci.conf"]] = ci.conf
-  res[["contrasts"]] = lmbds.orig
-  res[["contrasts.scaled"]] = lmbds
+  res[["contrast"]] = lmbds.orig
+  res[["contrast.scaled"]] = lmbds
   class(res) = c("bootES", "boot")
   
   return(res)
@@ -292,14 +292,14 @@ printTerse <- function(x) {
   ## calculated CI bounds
   stopifnot(inherits(x, "bootES"))
 
-  ## Print the scaled and unscaled contrasts.
-  if (!is.null(x$contrasts)) {
+  ## Print the scaled and unscaled contrast.
+  if (!is.null(x$contrast)) {
     cat(sprintf("User-specified lambdas: (%s)\n",
-                paste(x$contrasts, collapse=", ")))
+                paste(x$contrast, collapse=", ")))
   }
-  if (!is.null(x$contrasts.scaled)) {
+  if (!is.null(x$contrast.scaled)) {
     cat(sprintf("Scaled lambdas: (%s)\n",
-                paste(x$contrasts.scaled, collapse=", ")))
+                paste(x$contrast.scaled, collapse=", ")))
   }
 
   ## BEGIN: Code from boot::print.boot
@@ -332,7 +332,7 @@ determineStat <- function(dat,
                           data.col=NULL,
                           grps=NULL,
                           effect.type=NULL,
-                          contrasts=NULL) {
+                          contrast=NULL) {
   ## Based on the arguments passed to bootES, determine the type of statistic to
   ## calculate
   ##
@@ -341,7 +341,7 @@ determineStat <- function(dat,
   ##  data.col
   ##  grps:
   ##  effect.type:
-  ##  contrasts:
+  ##  contrast:
   ## 
 
   do.cor = (is.data.frame(dat) && ncol(dat) == 2 && is.numeric(dat[[1]]) && 
@@ -363,7 +363,7 @@ determineStat <- function(dat,
   } else { 
     if (identical(effect.type, 'slope')) {
       res = 'slope'
-    } else if (!is.null(contrasts)) {
+    } else if (!is.null(contrast)) {
       res = 'contrast'
     } else {
       if (is.numeric(dat)) {

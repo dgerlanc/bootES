@@ -36,7 +36,7 @@ test.determineStat <- function() {
   test.input = data.frame(score=c(g1, g2), group=grpLabels)
   test.result <- bootES:::determineStat(test.input,
                                         grps=grpLabels,
-                                        contrasts=lambdas)
+                                        contrast=lambdas)
   checkEquals(test.result, 'contrast')
     
 }

@@ -2,7 +2,7 @@
 ## Miscellaneous helper functions
 
 calcSlopeLambdas <- function(slope.levels) {
-  ## Converts unit measures into contrasts for calculating slope
+  ## Converts unit measures into contrast for calculating slope
   ##
   ## Args:
   ##   slope.levels: a named numeric vector of slope levels

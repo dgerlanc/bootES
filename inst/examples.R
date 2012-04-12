@@ -4,7 +4,7 @@ fn = system.file('gender.csv', package="bootES")
 myData = read.csv(fn, strip.white=TRUE, header=TRUE)
 myData.boot <- bootES(myData, data.col="Meas3", group.col="Condition",
                       effect.type="r",
-                      contrasts = c(A = -40, B = -10, C = 50))
+                      contrast = c(A = -40, B = -10, C = 50))
 
 ## 1.1.r One Group, One Measure on One Dependent Variable
 duration.boot <- bootES(faithful, data.col='eruptions')

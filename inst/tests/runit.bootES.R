@@ -22,9 +22,9 @@ test.bootES.input <- function() {
   res = try(bootES("foo"), silent=TRUE)
   checkTrue(grepl("'dat' must be a data.frame or numeric vector.", res))
 
-  ## Pass an invalid 'group' to 'contrasts'
+  ## Pass an invalid 'group' to 'contrast'
   res = try(bootES(gender, data.col="Meas3",
-    group.col="Condition", contrasts = c(Fake = -50, C = 50),
+    group.col="Condition", contrast = c(Fake = -50, C = 50),
     scale.weights=TRUE), silent=TRUE)
   checkTrue(grepl("'Fake' is/are not valid groups.", res[1]))
   
@@ -113,7 +113,7 @@ test.bootES.multivariate <- function() {
   set.seed(1)
   truth     = mean(g1) - mean(g2)
   unstdDiff.res = bootES(twoGpsA, R=1000, data.col="x", group.col="team",
-    effect.type="unstandardized", contrasts=lambdas)
+    effect.type="unstandardized", contrast=lambdas)
   checkEquals(truth, unstdDiff.res$t0)  
   
   ## Integration test of stat='contrast' and effect.type='unstandardized' where
@@ -140,7 +140,7 @@ test.bootES.contrast <- function() {
   set.seed(1)
   truth = -522.43
   test  = bootES(gender, data.col="Meas3", group.col="Condition",
-    contrasts = c(A = -40, B = -10, C = 50), scale.weights=FALSE)
+    contrast = c(A = -40, B = -10, C = 50), scale.weights=FALSE)
   checkEquals(truth, test$t0, tol=1e-2)
 
   ## Assert: Calculated value matches known value for an unstandardized
@@ -148,7 +148,7 @@ test.bootES.contrast <- function() {
   set.seed(1)
   truth.contrast.scaled = -10.4486
   test  = bootES(gender, data.col="Meas3", group.col="Condition",
-    contrasts = c(A = -40, B = -10, C = 50), scale.weights=TRUE)
+    contrast = c(A = -40, B = -10, C = 50), scale.weights=TRUE)
   checkEquals(truth.contrast.scaled, test$t0, tol=1e-4)
 
   ## Assert: Calculated value matches known value for an unstandardized
@@ -156,12 +156,12 @@ test.bootES.contrast <- function() {
   set.seed(1)
   truth.contrast.omit = -3.0535
   test  = bootES(gender, data.col="Meas3", group.col="Condition",
-    contrasts = c(A = -1, C = 1))  
+    contrast = c(A = -1, C = 1))  
   checkEquals(truth.contrast.omit, test$t0, tol=1e-4)
 
   ## Assert: Default weights of -1 and 1 are used when not passed in
   test.dflt  = bootES(gender, data.col="Meas3", group.col="Condition",
-    contrasts = c('A', 'C'))
+    contrast = c('A', 'C'))
   checkEquals(truth.contrast.omit, test.dflt$t0, tol=1e-4)
 }
 
@@ -216,7 +216,7 @@ test.bootES.output <- function() {
 
   ## It should print the statistic and the confidence interval to the screen
   test = capture.output(print(bootES(gender, data.col="Meas3",
-    group.col="Condition", contrasts = c(A = -40, B = -10, C = 50),
+    group.col="Condition", contrast = c(A = -40, B = -10, C = 50),
     scale.weights=TRUE)))
   
   checkTrue(grepl("User-specified lambdas: \\(-?\\d+, -?\\d+, -?\\d+\\)", 
