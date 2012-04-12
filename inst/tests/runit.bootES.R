@@ -182,9 +182,12 @@ test.bootES.slope <- function() {
   set.seed(1)
   truth <- -0.1244
   test  <- bootES(gender, data.col="Meas3", group.col="Condition",
-                  effect.type="slope",
                   slope.levels=c(A=30, B=60, C=120))
   checkEquals(truth, test$t0, tol=1e-2)
+  
+  test  <- bootES(gender, data.col="Meas3", slope.levels="Dosage")
+  checkEquals(truth, test$t0, tol=1e-2)
+                  
 }
 
 test.bootES.output <- function() {

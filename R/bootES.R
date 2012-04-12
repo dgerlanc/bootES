@@ -3,7 +3,7 @@
 
 bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
-                     "cohens.d.sigma", "r", "slope"),
+                     "cohens.d.sigma", "r"),
                    contrast=NULL,
                    slope.levels=NULL,
                    glass.control=NULL,
@@ -99,15 +99,27 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ## Process arguments for slope calculations
   lmbds = NULL
   lmbds.orig = contrast
-  if (effect.type == "slope") {
+  slope.levels.orig = slope.levels
+  if (!is.null(slope.levels))
+    effect.type = "slope"
+  if (identical(effect.type, "slope")) {
     if (is.null(vals))
       stop("Invalid 'data.col'.")
+
+    ## Process the column containing slope levels
+    if (is.character(slope.levels)) {
+      if (!slope.levels %in% names(dat))
+        stop("The column '", slope.levels, "' named in 'slope.levels'",
+             "does not exist in 'dat'.")
+
+      group.col = slope.levels
+      grps = as.factor(dat[[slope.levels]])
+      unique.levels = sort(unique(dat[[slope.levels]]))
+      slope.levels  = structure(unique.levels, names=unique.levels)
+    }
     
     if (is.null(grps))
       stop("Invalid 'group.col'")
-    
-    if (is.null(slope.levels))
-      stop("Must specify 'slope.levels'.")
 
     if (!is.null(contrast))
       stop("Cannot specify 'contrast' and 'slope.levels'")
@@ -154,7 +166,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
       stop("'contrast' must sum to 0.")
     
     ## Scale contrast if specified and not using the slope function
-    scale.lambdas = scale.weights && effect.type != "slope"
+    scale.lambdas = scale.weights && effect.type != 'slope'
     if (scale.lambdas)
       lmbds = scaleLambdasBySide(lmbds)    
     
@@ -370,7 +382,7 @@ determineStat <- function(dat,
       res = 'mean'
     }
   } else { 
-    if (identical(effect.type, 'slope')) {
+    if (identical(effect.type, "slope")) {
       res = 'slope'
     } else if (!is.null(contrast)) {
       res = 'contrast'
