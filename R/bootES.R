@@ -23,9 +23,9 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ##                   and contrast (optional) for each sample
   ##   R             : the number of bootstrap 'repetitions' to perform
   ##   data.col      : The column in 'dat' containing the sample values
-  ##   group.col       : The column in 'dat' containing the grouping info
+  ##   group.col     : The column in 'dat' containing the grouping info
   ##   effect.type   : The type of standardization to perform
-  ##   contrast     : A named vector specifying the lambdas for different
+  ##   contrast      : A named vector specifying the lambdas for different
   ##                   groups in 'dat'
   ##   slope.levels  : A named vector specifying the levels for different
   ##                   groups in 'dat'
@@ -240,7 +240,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   } else { # Two or more groups
     if (effect.type %in% c("cohens.d", "hedges.g", "cohens.d.sigma")) {
       res = boot(vals, calcCohensD, R, stype="f", strata=grps, grps=grps,
-        cohens.d.sigma=(effect.type == "cohens.d.sigma"),
+        contrast=contrast, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
         glass.control=glass.control)
     } else if (stat == "cor") {
       res = boot(dat, statistic=corBoot, R=R) 
