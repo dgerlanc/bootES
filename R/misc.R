@@ -1,4 +1,4 @@
-## Daniel Gerlanc and Kris Kirby (2010)
+## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Miscellaneous helper functions
 
 calcSlopeLambdas <- function(slope.levels) {

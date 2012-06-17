@@ -1,4 +1,4 @@
-## Daniel Gerlanc and Kris Kirby (2010)
+## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Function for calculating bootstrap correlations
 
 corBoot <- function(df, i) {

@@ -1,4 +1,4 @@
-## Daniel Gerlanc and Kris Kirby (2010)
+## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Functions for calculating slope
 
 calcSlope <- function(vals, freq, grps, lambdas) {

@@ -1,4 +1,4 @@
-## Daniel Gerlanc and Kris Kirby (2010)
+## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Helper functions for bootstrap analyses using the 'boot' package
 
 ## ######

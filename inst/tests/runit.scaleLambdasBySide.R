@@ -1,4 +1,4 @@
-## Daniel Gerlanc and Kris Kirby (2010)
+## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Input and regression tests for the scaleLambdasBySide function
 
 test.scaleLambdasBySide <- function() {

@@ -1,4 +1,4 @@
-## Daniel Gerlanc and Kris Kirby (2010)
+## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## High-level function for bootstrap analyses using the 'boot' package
 
 bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
