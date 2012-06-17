@@ -43,7 +43,7 @@ test.bootES.input <- function() {
 
   ## Use a 'glass.control' value that is not a valid group
   res <- try(bootES(data.frame(scores=1), glass.control="foo"), silent=TRUE)
-  checkTrue(grepl("'glass.control' missing", res))
+  checkTrue(grepl("'glass.control' is not", res))
 }
 
 test.bootES.univariate <- function() {
@@ -120,6 +120,25 @@ test.bootES.multivariate <- function() {
   ## there is only one group. This should cause an error.
   unstdDiff.err = try(bootES(twoGpsErr, R=1000, data.col="x", group.col="team",
     effect.type="unstandardized"), silent=TRUE)    
+
+  ## Integration test of stat='contrast' and effect.type='cohens.d.sigma'
+  set.seed(1)
+  test = bootES(gender, data.col="Meas1", group.col="Gender",
+    effect.type="cohens.d.sigma", contrast=c(female=1, male=-1))
+  checkEquals(-0.50104, test$t0, tol=1e-2)  
+
+  set.seed(1)
+  test = bootES(gender, data.col="Meas1", group.col="Gender",
+    effect.type="cohens.d.sigma", contrast=c(female=-1, male=+1))
+  checkEquals(0.50104, test$t0, tol=1e-2)  
+
+  ## Integration test of stat='contrast' and effect.type='cohens.d.sigma'
+  ## w/ glass control
+  set.seed(1)
+  test = bootES(gender, data.col="Meas1", group.col="Gender",
+    effect.type="cohens.d.sigma", contrast=c('female', 'male'),
+    glass.control='female')
+  checkEquals(0.55764, test$t0, tol=1e-2)
   
   ## Integration test of stat='cor'
   set.seed(1)
@@ -130,6 +149,8 @@ test.bootES.multivariate <- function() {
   truth     = with(twoGps, cor(g1, g2))
   cor.res   = suppressWarnings(bootES(twoGps, R=10, effect.type="r"))
   checkEquals(truth, cor.res$t0)
+
+  
   
 }
 

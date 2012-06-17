@@ -221,8 +221,8 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     if (!is.character(glass.control) || length(glass.control) != 1)
       stop("glass.control must be a character vector of length 1.")
 
-    if (!glass.control %in% colnames(dat))
-      stop("'glass.control' missing from 'dat'")
+    if (!glass.control %in% grps)
+      stop("'glass.control' is not a valid group.")
   }  
 
   ## Simplest Case: No groups, so we can calculate all of the stats for a single
