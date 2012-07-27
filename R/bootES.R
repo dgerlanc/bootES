@@ -303,7 +303,8 @@ printTerse <- function(x) {
   ## confidence level, the type of confidence interval, the statistic, and the
   ## calculated CI bounds
   stopifnot(inherits(x, "bootES"))
-
+  cat("\n")
+  
   ## Print the scaled and unscaled contrast.
   if (!is.null(x$contrast)) {
     lmbds.txt <- gsub(" +", "", formatC(x$contrast, digits=3, format="fg"))
@@ -335,6 +336,7 @@ printTerse <- function(x) {
   nms = c("Stat", "CI (Low)", "CI (High)", "bias", "std. error")
   res = matrix(c(t0, x[["bounds"]], bias, std.error),
                nrow=1, dimnames=list(NULL, nms))
+  res[, ] = round(res, 3)
 
   cat(sprintf("%.2f%% %s Confidence Interval, %d replicates\n",
               100 * x[["ci.conf"]],
@@ -342,8 +344,6 @@ printTerse <- function(x) {
               x[["R"]]))
 
   ## Print results w/ 3 digits to the right of the decimal point
-  out = res
-  out[, ] = sprintf("%.3f", res)
   out = capture.output(print(res))
   out = sub('[1,]', '   ', out, fixed=TRUE)
   cat(out, "", sep="\n")

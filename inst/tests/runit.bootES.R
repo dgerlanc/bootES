@@ -232,6 +232,7 @@ test.bootES.output <- function() {
   ## Validate output
   test = capture.output(print(bootES(threeGps,
     data.col="scores", effect.type="unstandardized")))
+  test = test[test != ""]
   
   str1 = " +Stat +CI \\(Low\\) +CI \\(High\\) +bias +std\\. error"
   checkTrue(grepl(str1, test[2], perl=TRUE))
@@ -242,6 +243,7 @@ test.bootES.output <- function() {
   test = capture.output(print(bootES(gender, data.col="Meas3",
     group.col="Condition", contrast = c(A = -40, B = -10, C = 50),
     scale.weights=TRUE)))
+  test = test[test != ""]
   
   checkTrue(grepl("User-specified lambdas: \\(-?\\d+, -?\\d+, -?\\d+\\)", 
                   test[1], perl=TRUE))
@@ -253,7 +255,8 @@ test.bootES.output <- function() {
     group.col="Condition",
     contrast = c(A = -0.33726, B = 0.27348, C = 0.06378),
     scale.weights=TRUE)))
-
+  test = test[test != ""]
+  
   check.regexp = "-0.[0-9]{3,}, 0.[0-9]{3,}, 0.[0-9]{3,}"
   checkTrue(grepl(check.regexp, test[1], perl=TRUE))
                   
