@@ -40,8 +40,14 @@ calcCohensD <- function(vals, freq, grps,
     means[nm]    = mean(sample.vals)
     ss[nm]       = sum((sample.vals - means[nm])^2)
 
-    if (identical(glass.control, nm))
-      glass.sd = sqrt(ss[nm] / (length(sample.vals) - 1))
+    if (identical(glass.control, nm)) {
+      if (cohens.d.sigma) {
+        denom = length(sample.vals)
+      } else {
+        denom = length(sample.vals) - 1
+      }
+      glass.sd = sqrt(ss[nm] / denom)
+    }
   }
 
   ## Calculate the standard deviation.

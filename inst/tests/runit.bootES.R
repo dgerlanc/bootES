@@ -138,7 +138,15 @@ test.bootES.multivariate <- function() {
   test = bootES(gender, data.col="Meas1", group.col="Gender",
     effect.type="cohens.d.sigma", contrast=c('female', 'male'),
     glass.control='female')
-  checkEquals(0.55764, test$t0, tol=1e-2)
+  checkEquals(0.588, test$t0, tol=1e-2)
+
+  ## Integration test of stat='contrast' and effect.type='cohens.d'
+  ## w/ glass control
+  set.seed(1)
+  test = bootES(gender, data.col="Meas1", group.col="Gender",
+    effect.type="cohens.d", contrast=c('female', 'male'),
+    glass.control='female')
+  checkEquals(0.557, test$t0, tol=1e-2)
   
   ## Integration test of stat='cor'
   set.seed(1)

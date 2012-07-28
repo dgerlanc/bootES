@@ -31,10 +31,16 @@ test.calcCohensD <- function() {
   checkEquals(truth, d.res, tol=1e-4)
   
   ## Regression test of calcCohensD w/ glass.control=TRUE
-  truth = (mean(g1) - mean(g2)) / sd(g1)
+  truth = (mean(g1) - mean(g2)) / sqrt(sum(((g1 - mean(g1))^2) / length(g1)))
   d.res.glass = bootES:::calcCohensD(twoGpsVec, freq=freqVec,
     grps=grpLabels, contrast=lambdas, cohens.d.sigma=TRUE, glass.control="A")
-    
+
   checkEquals(truth, d.res.glass, tol=1e-4)
   
+  ## Regression test of calcCohensD w/ glass.control=TRUE and
+  ## cohens.d.sigma=FALSE
+  truth = (mean(g1) - mean(g2)) / sd(g1)
+  d.res.glass = bootES:::calcCohensD(twoGpsVec, freq=freqVec,
+    grps=grpLabels, contrast=lambdas, cohens.d.sigma=FALSE, glass.control="A")
+  checkEquals(truth, d.res.glass, tol=1e-4)
 }
