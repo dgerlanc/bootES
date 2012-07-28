@@ -2,7 +2,7 @@
 ## Input and regression tests for the bootES function
 
 test.AAA <- function() {
-  gender <<- read.csv(system.file("gender.csv", package="bootES"),
+  gender <<- read.csv(system.file("example.csv", package="bootES"),
                       strip.white=TRUE, header=TRUE)
 }
 
@@ -184,6 +184,13 @@ test.bootES.contrast <- function() {
   test.dflt  = bootES(gender, data.col="Meas3", group.col="Condition",
     contrast = c('A', 'C'))
   checkEquals(truth.contrast.omit, test.dflt$t0, tol=1e-4)
+
+  ## Assert: Scales user-specified weights
+  set.seed(1)
+  truth = -0.475
+  test = bootES(gender, data.col = "Meas1", group.col = "Gender",
+    contrast=c(female = 3, male = -3), effect.type = "hedges.g")
+  checkEquals(truth, test$t0, tol=1e-3)
 }
 
 test.bootES.cor.diff <- function() {

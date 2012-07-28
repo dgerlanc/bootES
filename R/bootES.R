@@ -166,7 +166,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
       stop("'contrast' must sum to 0.")
     
     ## Scale contrast if specified and not using the slope function
-    scale.lambdas = scale.weights && effect.type != 'slope'
+    scale.lambdas = effect.type != 'unstandardized' || scale.weights
     if (scale.lambdas)
       lmbds = scaleLambdasBySide(lmbds)    
     
@@ -240,7 +240,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   } else { # Two or more groups
     if (effect.type %in% c("cohens.d", "hedges.g", "cohens.d.sigma")) {
       res = boot(vals, calcCohensD, R, stype="f", strata=grps, grps=grps,
-        contrast=contrast, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
+        contrast=lmbds, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
         glass.control=glass.control)
     } else if (stat == "cor") {
       res = boot(dat, statistic=corBoot, R=R) 
