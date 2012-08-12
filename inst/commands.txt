@@ -1,0 +1,103 @@
+## This file contains all of the example commands from the article
+## bootES: An R Package for Bootstrap Confidence Intervals on Effect Sizes
+## by Kris N. Kirby and Daniel Gerlanc (2012)
+
+## APPENDIX
+## Commands in R
+system.file("commands.txt", package="bootES")  ## Obtains this file.
+
+## Installing and Loading the bootES Package
+install.packages("bootES")
+
+library(bootES)
+
+
+## Importing Data
+myData = read.csv(file=file.choose(), strip.white=TRUE, header=TRUE)
+
+myData = read.csv(file=system.file("example.csv", package="bootES"), strip.white=TRUE, header=TRUE)
+
+
+## Exporting Data
+write.csv(myData, file="myNewData.csv", row.names=FALSE)
+
+
+## Selecting Variables (Columns)
+myData[ c("Meas1","Meas2") ]
+
+
+## Selecting Data Subsets (Rows)
+female.A = subset(myData, Gender=="female" & Condition=="A")
+
+
+## CIs on Means, and Options
+mean(myData$Meas1)
+
+set.seed(1)
+
+bootES(myData$Meas1)
+
+bootES(myData$Meas1, ci.conf = 0.99)
+
+bootES(myData$Meas1, ci.type = "norm")
+
+bootES(myData$Meas1, plot=TRUE)
+
+
+## BETWEEN SUBJECTS EFFECTS
+
+## Unstandardized Effect-Size Measures
+## Contrasts
+bootES(myData, data.col = "Meas1", group.col = "Gender", contrast=c("female", "male"))
+
+by(myData$Meas1, myData$Gender, mean)
+
+bootES(myData, data.col = "Meas1", group.col = "Condition", contrast = c(A=-40, B=-10, C=50))
+
+bootES(myData, data.col = "Meas1", group.col = "Condition", contrast = c(A=-40, B=-10, C=50), scale.weights=FALSE)
+
+bootES(myData, data.col="Meas1", slope.levels="Dosage")
+
+bootES(myData, data.col="Meas1", group.col = "Condition", slope.levels = c(A=30, B=60, C=120))
+
+
+## Standardized Effect-Size Measures
+bootES(myData, data.col = "Meas1", group.col = "Gender", contrast=c(female=-1, male=1), effect.type = "cohens.d.sigma")
+
+bootES(myData, data.col = "Meas1", group.col = "Gender", contrast=c("female", "male"), effect.type = "hedges.g")
+
+bootES(myData, data.col = "Meas1", group.col = "Gender", contrast = c("female", "male"), effect.type="hedges.g", glass.control = "female")
+
+bootES(myData, data.col="Meas1", group.col="Condition", contrast = c(A = -40, B = -10, C = 50), effect.type="hedges.g")
+
+bootES(myData, data.col="Meas1", group.col="Condition", contrast = c(A = -40, B = -10, C = 50), effect.type="r" )
+
+
+## WITHIN-SUBJECTS EFFECTS
+
+## Unstandardized Mean Differences, and Contrasts Within Subjects
+myData$M3minusM1 = myData$Meas3 - myData$Meas1
+
+bootES(myData$M3minusM1)
+
+myData$M3vM1M2 = (-0.5)*myData$Meas1 + (-0.5)*myData$Meas2 + (1)*myData$Meas3
+
+bootES(myData$M3vM1M2)
+
+
+## Standardized Mean Differences, and Contrasts Within Subjects
+bootES(myData$M3vM1M2, effect.type = "hedges.g")
+
+bootES(myData$M3vM1M2, effect.type = "r")
+
+
+## CORRELATIONS
+cor( myData[c("Meas2","Meas3")] )
+
+bootES(myData[c("Meas2","Meas3")])
+
+bootES(myData[c("Meas2","Meas3","Gender")], group.col = "Gender")
+
+
+## FACTORIAL DESIGNS
+myData$GenderByCond = paste(myData$Gender, myData$Condition, sep = "-")

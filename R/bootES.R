@@ -336,17 +336,29 @@ printTerse <- function(x) {
   nms = c("Stat", "CI (Low)", "CI (High)", "bias", "std. error")
   res = matrix(c(t0, x[["bounds"]], bias, std.error),
                nrow=1, dimnames=list(NULL, nms))
-  res[, ] = round(res, 3)
+  res = as.vector(round(res, 3))
 
   cat(sprintf("%.2f%% %s Confidence Interval, %d replicates\n",
               100 * x[["ci.conf"]],
               x[["ci.type"]],
               x[["R"]]))
 
+  hdr <- dat <- character()  
+  cols   <- c("Stat", "CI (Low)", "CI (High)", "bias", "SE")
+  for (i in seq_along(cols)) {
+    col <- cols[i]
+    dat[i]    <- sprintf("%-6.3f", res[i])
+    char.diff <- nchar(dat[i]) - nchar(col)
+    spaces <- paste(rep(" ", char.diff + 5L), collapse="")
+    hdr[i] <- paste(col, spaces, collapse="")
+    dat[i] <- paste(dat[i], "     ", collapse="")
+  }
+
+  hdr <- paste(hdr, collapse="")
+  dat <- paste(dat, collapse="")
+  
   ## Print results w/ 3 digits to the right of the decimal point
-  out = capture.output(print(res))
-  out = sub('[1,]', '   ', out, fixed=TRUE)
-  cat(out, "", sep="\n")
+  cat(hdr, dat, "", sep="\n")
 }
 
 determineStat <- function(dat,
