@@ -3,6 +3,7 @@
 
 calcCohensD <- function(vals, freq, grps,
                         contrast,
+                        hedges.g=FALSE,
                         cohens.d.sigma=FALSE,
                         glass.control="") {
   ## Compute Cohen's d/Hedge's g or optionally Cohen's Sigma D for the
@@ -16,6 +17,7 @@ calcCohensD <- function(vals, freq, grps,
   ##   @param grps a grouping vector of the same length as 'vals'
   ##   @param contrast a named, numeric vector of contrast weights.
   ##     The names must match the values in 'grps'
+  ##   @param hedges.g Whether to make the hedges.g adjustment to cohens.d
   ##   @param cohens.d.sigma Whether to use the population standard
   ##     deviation instead of the sample standard deviation
   ##   @param glass.control a character vector of length 1 specifying the
@@ -51,15 +53,19 @@ calcCohensD <- function(vals, freq, grps,
   }
 
   ## Calculate the standard deviation.
+  num.grps     = length(grp.idx)
+  df = if (cohens.d.sigma) length(vals) else length(vals) - num.grps
   if (!is.null(glass.sd)) {
     sd.hat = glass.sd
-  } else {
-    num.grps     = length(grp.idx)
-    sd.hat.denom = if (cohens.d.sigma) length(vals) else length(vals) - num.grps
-    sd.hat       = sqrt(sum(ss) / sd.hat.denom)
+  } else {    
+    sd.hat = sqrt(sum(ss) / df)
   }
 
   res = sum(contrast[grp.nms] * means) / sd.hat
   res = as.vector(res) # remove names from 'means'
+  if (hedges.g) {
+    hadj = gamma(df/2)/( sqrt(df/2)*gamma((df-1)/2) )
+    res  = hadj * res
+  }
   return(res)
 }

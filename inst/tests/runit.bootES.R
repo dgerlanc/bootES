@@ -89,9 +89,9 @@ test.bootES.univariate <- function() {
     effect.type="cohens.d.sigma")
   checkEquals(truth, rMean.res$t0)
   
-  ## Test: 'dMeanBoot' and Hedge's g through 'bootES'
+  ## Test: 'hMeanBoot' and Hedge's g through 'bootES'
   set.seed(1)
-  truth     = bootES:::dMean(threeGps$scores)
+  truth     = bootES:::hMean(threeGps$scores)
   rMean.res = bootES(threeGps, R=1000, data.col="scores",
     effect.type="hedges.g")
   checkEquals(truth, rMean.res$t0)
@@ -195,7 +195,7 @@ test.bootES.contrast <- function() {
 
   ## Assert: Scales user-specified weights
   set.seed(1)
-  truth = -0.475
+  truth = -0.45488
   test = bootES(gender, data.col = "Meas1", group.col = "Gender",
     contrast=c(female = 3, male = -3), effect.type = "hedges.g")
   checkEquals(truth, test$t0, tol=1e-3)
@@ -224,59 +224,6 @@ test.bootES.slope <- function() {
   test  <- bootES(gender, data.col="Meas3", slope.levels="Dosage")
   checkEquals(truth, test$t0, tol=1e-2)
                   
-}
-
-test.bootES.output <- function() {
-  
-  ## Test the verbosity of bootES functions
-  g1 = c(11, 12, 13, 14, 15)
-  g2 = c(26, 27, 28, 29)
-  g3 = c(17, 18, 19, 20, 21, 22, 23)
-  
-  grpLabels = rep(c("A", "B", "C"), times=c(length(g1), length(g2), length(g3)))
-  threeGps  = data.frame(grpLabels, scores=c(g1, g2, g3))
-  threeGpsVec = c(g1, g2, g3)
-  lambdas   = c(A=-1, B=0, C=1)
-
-  ## It shouldn't print anything to the screen.
-  test = capture.output(assign("mean.res", bootES(threeGps,
-    data.col="scores", effect.type="unstandardized")))
-
-  checkTrue(length(test) == 0)
-  
-  ## Validate output
-  test = capture.output(print(bootES(threeGps,
-    data.col="scores", effect.type="unstandardized")))
-  test = test[test != ""]
-  
-  str1 = " +Stat +CI \\(Low\\) +CI \\(High\\) +bias +std\\. error"
-  checkTrue(grepl(str1, test[2], perl=TRUE))
-  str2 = " +[\\d.]+ +[\\d.]+ +[\\d.]+ +[-\\d.]+ +[\\d.]+"
-  checkTrue(grepl(str2, test[3], perl=TRUE))
-
-  ## It should print the statistic and the confidence interval to the screen
-  test = capture.output(print(bootES(gender, data.col="Meas3",
-    group.col="Condition", contrast = c(A = -40, B = -10, C = 50),
-    scale.weights=TRUE)))
-  test = test[test != ""]
-  
-  checkTrue(grepl("User-specified lambdas: \\(-?\\d+, -?\\d+, -?\\d+\\)", 
-                  test[1], perl=TRUE))
-  regexp = paste("Scaled lambdas: \\(-?[0-9.]+, -?[0-9.]+, -?[0-9.]+\\)")
-  checkTrue(grepl(regexp, test[2], perl=TRUE))
-
-  ## It should output to 3 significant digits for the user lambdas
-  test = capture.output(print(bootES(gender, data.col="Meas3",
-    group.col="Condition",
-    contrast = c(A = -0.33726, B = 0.27348, C = 0.06378),
-    scale.weights=TRUE)))
-  test = test[test != ""]
-  
-  check.regexp = "-0.[0-9]{3,}, 0.[0-9]{3,}, 0.[0-9]{3,}"
-  checkTrue(grepl(check.regexp, test[1], perl=TRUE))
-                  
-  check.regexp = check.string = "1, 0.[0-9]{3,}, 0.[0-9]{3,}"
-  checkTrue(grepl(check.regexp, test[2], perl=TRUE))
 }
 
 test.bootES.citype <- function() {

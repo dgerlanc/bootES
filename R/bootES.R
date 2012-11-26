@@ -233,7 +233,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     boot.fun <- switch(effect.type,
                        unstandardized = meanBoot,
                        r              = rMeanBoot,
-                       hedges.g       = dMeanBoot,
+                       hedges.g       = hMeanBoot,
                        cohens.d       = dMeanBoot,
                        cohens.d.sigma = dSigmaMeanBoot)    
     res = boot(vals, statistic=boot.fun, R=R) 
@@ -241,7 +241,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     if (effect.type %in% c("cohens.d", "hedges.g", "cohens.d.sigma")) {
       res = boot(vals, calcCohensD, R, stype="f", strata=grps, grps=grps,
         contrast=lmbds, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
-        glass.control=glass.control)
+        glass.control=glass.control, hedges.g=(effect.type == "hedges.g"))
     } else if (stat == "cor") {
       res = boot(dat, statistic=corBoot, R=R) 
     } else if (stat == "cor.diff") {

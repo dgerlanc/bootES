@@ -22,6 +22,22 @@ dMean <- function(x)
 dMeanBoot <- function(x, i)
   mean(x[i]) / sd(x[i])
 
+## Compute Hedge's g for a mean effect
+hMean <- function(x) {
+  df   = length(x) - 1
+  hadj = gamma(df/2) / ( sqrt(df/2)*gamma((df-1)/2) )
+  hadj * mean(x) / sd(x)
+}
+
+## Compute the effect size g for a mean effect for resamples in the boot()
+## command.
+hMeanBoot <- function(x, i) {
+  vals = x[i]
+  df   = length(vals) - 1
+  hadj = gamma(df/2) / ( sqrt(df/2) * gamma((df-1)/2))
+  hadj * mean(vals) / sd(vals)
+}
+
 ## Compute the effect size 'Cohen's sigma d' for a mean effect for
 ## resamples in the boot() command.
 dSigmaMeanBoot <- function(x, i)
