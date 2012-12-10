@@ -13,7 +13,7 @@ calcUnstandardizedMean <- function(vals, freq, grps, lambdas) {
   ## Args:
   ##   vals: a numeric vector of values
   ##   freq: a frequency vector of length equal to the number of records in 
-  ##    'dat' indicating how many times an observation should be drawn
+  ##    'data' indicating how many times an observation should be drawn
   ##     from each sample.
   ##   grps: an optional grouping vector of the same length as 'vals'
   ##   lambdas: an optional named vector of weights to scale the means

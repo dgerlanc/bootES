@@ -12,13 +12,13 @@ corBoot <- function(df, i) {
   cor(df[i, 1], df[i, 2])
 }
   
-calcBootCor <- function(dat, freq) {
+calcBootCor <- function(data, freq) {
   ## Compute a bootstrap correlation between two variables
   ## 
   ## Args:
-  ##   dat: a data frame containing columns 'x' and 'y'
+  ##   data: a data frame containing columns 'x' and 'y'
   ##   freq: a frequency vector of length equal to the number of records in 
-  ##    'dat' indicating how many times an observation should be drawn
+  ##    'data' indicating how many times an observation should be drawn
   ##     from each sample.
   ##  
   ## Details:
@@ -26,19 +26,19 @@ calcBootCor <- function(dat, freq) {
   ##   to the 'boot' function. 'freq' should be a frequency vector of
   ##   the type returned by 'boot' when stype='f'
 
-  sample.idx  = rep(seq_len(nrow(dat)), times=freq)
-  sample.vals = dat[sample.idx, c(1, 2)]
+  sample.idx  = rep(seq_len(nrow(data)), times=freq)
+  sample.vals = data[sample.idx, c(1, 2)]
   res         = cor(sample.vals[[1]], sample.vals[[2]])
   res
 }
 
-calcBootCorDiff <- function(dat, freq, grps) {
+calcBootCorDiff <- function(data, freq, grps) {
   ## Compute the difference in correlation between 2 groups
   ## 
   ## Args:
-  ##   dat: a data frame containing columns 'x' and 'y'
+  ##   data: a data frame containing columns 'x' and 'y'
   ##   freq: a frequency vector of length equal to the number of records in 
-  ##    'dat' indicating how many times an observation should be drawn
+  ##    'data' indicating how many times an observation should be drawn
   ##     from each sample.
   ##   grps: a grouping vector of the same length as 'vals'
   ##  
@@ -48,7 +48,7 @@ calcBootCorDiff <- function(dat, freq, grps) {
   ##   the type returned by 'boot' when stype='f'
   
   ## Get the row indices of the different groups.
-  grp.idx = split(seq_len(nrow(dat)), grps, drop=TRUE)   
+  grp.idx = split(seq_len(nrow(data)), grps, drop=TRUE)   
 
   if (length(grp.idx) != 2)
     stop("There must be only 2 groups!")
@@ -58,7 +58,7 @@ calcBootCorDiff <- function(dat, freq, grps) {
   for (i in seq_along(grp.idx)) {
     this.grp.idx = grp.idx[[i]]
     sample.idx   = rep(this.grp.idx, times=freq[this.grp.idx])
-    sample.vals  = dat[sample.idx, c(1, 2)]
+    sample.vals  = data[sample.idx, c(1, 2)]
     cors[i]      = cor(sample.vals[[1]], sample.vals[[2]])
   }
 

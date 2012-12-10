@@ -1,7 +1,7 @@
 ## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## High-level function for bootstrap analyses using the 'boot' package
 
-bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
+bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r"),
                    contrast=NULL,
@@ -18,17 +18,17 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ## effect sizes.
   ##
   ## Args:
-  ##   dat           : a vector or data frame containing the one or more
+  ##   data           : a vector or data frame containing the one or more
   ##                   columns of values (required), group labels (optional),
   ##                   and contrast (optional) for each sample
   ##   R             : the number of bootstrap 'repetitions' to perform
-  ##   data.col      : The column in 'dat' containing the sample values
-  ##   group.col     : The column in 'dat' containing the grouping info
+  ##   data.col      : The column in 'data' containing the sample values
+  ##   group.col     : The column in 'data' containing the grouping info
   ##   effect.type   : The type of standardization to perform
   ##   contrast      : A named vector specifying the lambdas for different
-  ##                   groups in 'dat'
+  ##                   groups in 'data'
   ##   slope.levels  : A named vector specifying the levels for different
-  ##                   groups in 'dat'
+  ##                   groups in 'data'
   ##   glass.control : The group for which the standard deviation should
   ##                   be used, eg. "glass.control='A'"
   ##   scale.weights : TRUE/FALSE, scale the lambdas to [-1, 1]
@@ -42,26 +42,26 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
   ##   An object of class 'bootES' and 'boot'
   ##
   ## Details: If 'R' is not a whole number, it will be round down to the nearest
-  ## whole number.  * stat=cor: 'dat' must be a two-column data frame, where
+  ## whole number.  * stat=cor: 'data' must be a two-column data frame, where
   ## each of the columns is numeric
 
   ## Error handling
   effect.type = match.arg(effect.type)
   ci.type     = match.arg(ci.type)
   
-  ## Checks on 'dat'.
-  if (!(is.data.frame(dat) || is.numeric(dat)))
-    stop("'dat' must be a data.frame or numeric vector.")
+  ## Checks on 'data'.
+  if (!(is.data.frame(data) || is.numeric(data)))
+    stop("'data' must be a data.frame or numeric vector.")
 
-  ## If 'dat' has been passed as a numeric vector, save it as a data.frame
+  ## If 'data' has been passed as a numeric vector, save it as a data.frame
   ## with a data.col='scores'
-  if (is.numeric(dat)) {
-      dat      = data.frame(scores=dat, row.names=NULL)
+  if (is.numeric(data)) {
+      data      = data.frame(scores=data, row.names=NULL)
       data.col = "scores"
   }
   
-  if (!nrow(dat) > 0)
-    stop("'dat' contains no records!")
+  if (!nrow(data) > 0)
+    stop("'data' contains no records!")
   
   ## Checks on 'R'.
   R = as.integer(R)
@@ -74,10 +74,10 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     if (!is.character(data.col))
       stop("'data.col' must be a character vector.")
   
-    if (!data.col %in% colnames(dat))
-      stop("'data.col' missing from 'dat'")
+    if (!data.col %in% colnames(data))
+      stop("'data.col' missing from 'data'")
 
-    vals = dat[[data.col]]
+    vals = data[[data.col]]
   }
   
   ## Check and extract 'group.col'.
@@ -86,10 +86,10 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     if (!is.character(group.col)) 
       stop("'group.col' must be a character vector.")
     
-    if (!group.col %in% colnames(dat))
-      stop("'group.col' missing from 'dat'")
+    if (!group.col %in% colnames(data))
+      stop("'group.col' missing from 'data'")
     
-    grps = as.factor(dat[[group.col]])
+    grps = as.factor(data[[group.col]])
   }  
 
   ## Checks on scale.weights
@@ -108,13 +108,13 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
 
     ## Process the column containing slope levels
     if (is.character(slope.levels)) {
-      if (!slope.levels %in% names(dat))
+      if (!slope.levels %in% names(data))
         stop("The column '", slope.levels, "' named in 'slope.levels'",
-             "does not exist in 'dat'.")
+             "does not exist in 'data'.")
 
       group.col = slope.levels
-      grps = as.factor(dat[[slope.levels]])
-      unique.levels = sort(unique(dat[[slope.levels]]))
+      grps = as.factor(data[[slope.levels]])
+      unique.levels = sort(unique(data[[slope.levels]]))
       slope.levels  = structure(unique.levels, names=unique.levels)
     }
     
@@ -130,7 +130,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     
     lmbds <- calcSlopeLambdas(slope.levels)
 
-    ## Assert that there are no NA slopes, then subset 'dat' to the groups for
+    ## Assert that there are no NA slopes, then subset 'data' to the groups for
     ## which slope.levels were provided.
     lmbds.exist   = names(lmbds) %in% grps
     missing.lmbds = names(lmbds)[!lmbds.exist]
@@ -140,10 +140,10 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
            " is/are not valid groups.")
     
     boot.groups = unique(names(lmbds))
-    dat  = dat[dat[[group.col]] %in% boot.groups, ]
+    data  = data[data[[group.col]] %in% boot.groups, ]
 
-    grps = as.factor(dat[[group.col]])
-    vals = dat[[data.col]]
+    grps = as.factor(data[[group.col]])
+    vals = data[[data.col]]
   }
 
   
@@ -170,7 +170,7 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
     if (scale.lambdas)
       lmbds = scaleLambdasBySide(lmbds)    
     
-    ## Assert that there are no NA lambdas, then subset 'dat' to the groups for
+    ## Assert that there are no NA lambdas, then subset 'data' to the groups for
     ## which contrast were provided.
     lmbds.exist   = names(lmbds) %in% grps
     missing.lmbds = names(lmbds)[!lmbds.exist]
@@ -180,20 +180,20 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
            " is/are not valid groups.")
     
     boot.groups = unique(names(lmbds))
-    dat  = dat[dat[[group.col]] %in% boot.groups, ]
+    data  = data[data[[group.col]] %in% boot.groups, ]
 
-    vals = dat[[data.col]]
-    grps = as.factor(dat[[group.col]])
+    vals = data[[data.col]]
+    grps = as.factor(data[[group.col]])
   }
 
   ## Determine the 'stat' based on the passed arguments
-  stat = determineStat(dat, data.col, grps, effect.type, lmbds)
+  stat = determineStat(data, data.col, grps, effect.type, lmbds)
   
   ## Error handling for the stat='cor'
   if (stat == "cor") {
-    is.valid = length(dat) == 2 && all(sapply(dat, is.numeric))
+    is.valid = length(data) == 2 && all(sapply(data, is.numeric))
     if (!is.valid)
-      stop("'dat' must be a data frame with two numeric columns.")
+      stop("'data' must be a data frame with two numeric columns.")
   }
 
   ## Error handling for the stat='cor.diff'
@@ -206,14 +206,14 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
 
     ## Assert that there are 2 numeric columns and reorder these
     ## to be the first 2 columns in the data frame
-    num.col.idx = which(sapply(dat, is.numeric))
+    num.col.idx = which(sapply(data, is.numeric))
     num.col.idx = num.col.idx[!names(num.col.idx) %in% group.col]    
     is.valid = length(num.col.idx) == 2
     if (!is.valid)
-      stop("'dat' must contain 2 numeric columns and a grouping column.")
+      stop("'data' must contain 2 numeric columns and a grouping column.")
     
-    group.col.idx = match(group.col, names(dat))
-    dat = dat[, c(num.col.idx, group.col.idx)]
+    group.col.idx = match(group.col, names(data))
+    data = data[, c(num.col.idx, group.col.idx)]
   }    
   
   ## Error handling for 'glass.control'
@@ -243,9 +243,9 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
         contrast=lmbds, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
         glass.control=glass.control, hedges.g=(effect.type == "hedges.g"))
     } else if (stat == "cor") {
-      res = boot(dat, statistic=corBoot, R=R) 
+      res = boot(data, statistic=corBoot, R=R) 
     } else if (stat == "cor.diff") {
-      res = boot(dat, calcBootCorDiff, R=R, stype="f", strata=grps, grps=grps)
+      res = boot(data, calcBootCorDiff, R=R, stype="f", strata=grps, grps=grps)
     } else if (stat == "slope") {      
       res = boot(vals, calcSlope, R=R, stype="f", strata=grps,
         grps=grps, lambdas=lmbds)
@@ -258,10 +258,10 @@ bootES <- function(dat, R=1000, data.col=NULL, group.col=NULL,
       res = boot(vals, calcPearsonsR, R, stype="f", strata=grps, grps=grps,
         lambdas=lmbds)
     } else {
-      fmt = paste("effect.type: %s for a 'dat' of class '%s' of length %d",
+      fmt = paste("effect.type: %s for a 'data' of class '%s' of length %d",
         "with data.col of class %s and group.col of class %s not implemented.",
         collapse="")
-      msg = sprintf(msg, effect.type, class(dat), length(dat), class(grps),
+      msg = sprintf(msg, effect.type, class(data), length(data), class(grps),
         class(vals))
       stop(msg)
     }
@@ -336,6 +336,7 @@ printTerse <- function(x) {
   nms = c("Stat", "CI (Low)", "CI (High)", "bias", "std. error")
   res = matrix(c(t0, x[["bounds"]], bias, std.error),
                nrow=1, dimnames=list(NULL, nms))
+  res.orig <- res
   res = as.vector(round(res, 3))
 
   cat(sprintf("%.2f%% %s Confidence Interval, %d replicates\n",
@@ -343,25 +344,26 @@ printTerse <- function(x) {
               x[["ci.type"]],
               x[["R"]]))
 
-  hdr <- dat <- character()  
+  hdr <- data <- character()  
   cols   <- c("Stat", "CI (Low)", "CI (High)", "bias", "SE")
   for (i in seq_along(cols)) {
     col <- cols[i]
-    dat[i]    <- sprintf("%-6.3f", res[i])
-    char.diff <- nchar(dat[i]) - nchar(col)
+    data[i]    <- sprintf("%-6.3f", res[i])
+    char.diff <- nchar(data[i]) - nchar(col)
     spaces <- paste(rep(" ", char.diff + 5L), collapse="")
     hdr[i] <- paste(col, spaces, collapse="")
-    dat[i] <- paste(dat[i], "     ", collapse="")
+    data[i] <- paste(data[i], "     ", collapse="")
   }
 
   hdr <- paste(hdr, collapse="")
-  dat <- paste(dat, collapse="")
+  data <- paste(data, collapse="")
   
   ## Print results w/ 3 digits to the right of the decimal point
-  cat(hdr, dat, "", sep="\n")
+  cat(hdr, data, "", sep="\n")
+  invisible(res.orig)
 }
 
-determineStat <- function(dat,
+determineStat <- function(data,
                           data.col=NULL,
                           grps=NULL,
                           effect.type=NULL,
@@ -370,15 +372,15 @@ determineStat <- function(dat,
   ## calculate
   ##
   ## Args:
-  ##  dat:
+  ##  data:
   ##  data.col
   ##  grps:
   ##  effect.type:
   ##  contrast:
   ## 
 
-  do.cor = (is.data.frame(dat) && ncol(dat) == 2 && is.numeric(dat[[1]]) && 
-            is.numeric(dat[[2]]))
+  do.cor = (is.data.frame(data) && ncol(data) == 2 && is.numeric(data[[1]]) && 
+            is.numeric(data[[2]]))
   res = ''
   if (is.null(grps)) {
     ## Single Group
@@ -399,11 +401,11 @@ determineStat <- function(dat,
     } else if (!is.null(contrast)) {
       res = 'contrast'
     } else {
-      if (is.numeric(dat)) {
+      if (is.numeric(data)) {
         res = 'mean'
       } else {
-        useCorDiff = is.data.frame(dat) && length(unique(grps)) == 2 &&
-        ncol(dat) > 2
+        useCorDiff = is.data.frame(data) && length(unique(grps)) == 2 &&
+        ncol(data) > 2
         if (useCorDiff)
           res = 'cor.diff'
         else
@@ -412,4 +414,25 @@ determineStat <- function(dat,
     }
   }
   return(res)
+}
+
+summary.bootES <- function(object, ...) {
+  ## BEGIN: Code from boot::print.boot
+  x = object
+  index  = seq_len(ncol(x$t))
+  t      = matrix(x$t[, index], nrow = nrow(x$t))
+  allNA  = apply(t, 2L, function(t) all(is.na(t)))
+  ind1   = index[allNA]
+  index  = index[!allNA]
+  t      = matrix(t[, !allNA], nrow = nrow(t))
+  t0     = x$t0
+  
+  bias = apply(t, 2L, mean, na.rm=TRUE) - t0
+  std.error = sqrt(apply(t, 2L, function(t.st) var(t.st[!is.na(t.st)])))
+  ## END: Code from boot::print.boot
+  
+  nms = c("stat", "ci.low", "ci.high", "bias", "std.error")
+  res = matrix(c(t0, x[["bounds"]], bias, std.error),
+               nrow=1, dimnames=list(NULL, nms))
+  res
 }

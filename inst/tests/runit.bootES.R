@@ -18,9 +18,9 @@ test.bootES.input <- function() {
   threeGpsVec = c(g1, g2, g3)
   lambdas   = c(A=-1, B=2, C=-1)
     
-  ## Pass a non-data.frame object as 'dat'
+  ## Pass a non-data.frame object as 'data'
   res = try(bootES("foo"), silent=TRUE)
-  checkTrue(grepl("'dat' must be a data.frame or numeric vector.", res))
+  checkTrue(grepl("'data' must be a data.frame or numeric vector.", res))
 
   ## Pass an invalid 'group' to 'contrast'
   res = try(bootES(gender, data.col="Meas3",
@@ -28,7 +28,7 @@ test.bootES.input <- function() {
     scale.weights=TRUE), silent=TRUE)
   checkTrue(grepl("'Fake' is/are not valid groups.", res[1]))
   
-  ## Pass a data.frame to 'dat' with no records
+  ## Pass a data.frame to 'data' with no records
   checkException(bootES(data.frame()), silent=TRUE)
   
   ## Pass an 'R' of length greater than 1
@@ -38,7 +38,7 @@ test.bootES.input <- function() {
   res <- try(bootES(data.frame(scores=1), R=0.5), silent=TRUE)
   checkTrue(grepl("integer of length 1", res))
   
-  ## Use a 'data.col' not in 'dat'
+  ## Use a 'data.col' not in 'data'
   checkException(bootES(threeGps, R=100, data.col="foo"), silent=TRUE)
 
   ## Use a 'glass.control' value that is not a valid group

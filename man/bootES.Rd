@@ -6,7 +6,7 @@
   
 }
 \usage{
-bootES(dat, R=1000, data.col=NULL, group.col=NULL, 
+bootES(data, R=2000, data.col=NULL, group.col=NULL, 
        effect.type = c("unstandardized", "cohens.d", "hedges.g",
                        "cohens.d.sigma", "r"),
        contrast = NULL,
@@ -20,10 +20,10 @@ bootES(dat, R=1000, data.col=NULL, group.col=NULL,
 }
 
 \arguments{
-  \item{dat}{A numeric vector, or data frame containing at least one column of numerical values, and (optionally) one or more columns of categorical group labels.}
+  \item{data}{A numeric vector, or data frame containing at least one column of numerical values, and (optionally) one or more columns of categorical group labels.}
   \item{R}{The number of bootstrap resamples to perform.}
-  \item{data.col}{The name of the column in \code{dat} containing the sample values (the "dependent" or "outcome" variable).}
-  \item{group.col}{The name of the column in \code{dat} containing the categorical group labels (the "independent" or "categorical predictor" variable).}
+  \item{data.col}{The name of the column in \code{data} containing the sample values (the "dependent" or "outcome" variable).}
+  \item{group.col}{The name of the column in \code{data} containing the categorical group labels (the "independent" or "categorical predictor" variable).}
   \item{effect.type}{Specifies the type of effect-size measure to estimate. The default is "unstandardized".}
   \item{contrast}{A named vector that pairs group labels with their contrast weights. See below for usage.}
   \item{scale.weights}{When TRUE (the default), the contrast weights are scaled so that the unstandardized contrast expresses the effect in the original units of measurement. When FALSE, the magnitude of an unstandardized contrast is a function of the scale of the contrast weights.}
@@ -39,7 +39,7 @@ bootES(dat, R=1000, data.col=NULL, group.col=NULL,
 	An introduction to \code{bootES}, with illustrations of its usage, can be found in:
 	Kirby, K. N., & Gerlanc, D. (2012).  BootES: An R Package for Bootstrap Confidence Intervals on Effect Sizes.  Unpublished manuscript.
 	
-	When \code{dat} is a single column of numbers, and no grouping variable is provided, \code{bootES} finds the mean of that column and its bootstrap confidence interval.
+	When \code{data} is a single column of numbers, and no grouping variable is provided, \code{bootES} finds the mean of that column and its bootstrap confidence interval.
 	
 	The standardized effect-size options are: 
 	"r", which expresses the effect as Pearson's r;
@@ -61,7 +61,7 @@ When the predictor column contains group labels (e.g., "child", "teen", and "adu
 
 \code{bootES(myDataFrame, data.col="Income", group.col="Age", slope.levels=c(child=5, teen=15, adult=25))}  
 
-	When \code{dat} contains only a pair of columns of numbers, \code{bootES} finds the Pearson product-moment correlation between those columns and its bootstrap confidence interval.  For example, in the data frame "myDataFrame," the correlation between Income and Age could be found by
+	When \code{data} contains only a pair of columns of numbers, \code{bootES} finds the Pearson product-moment correlation between those columns and its bootstrap confidence interval.  For example, in the data frame "myDataFrame," the correlation between Income and Age could be found by
 	
 \code{bootES(myDataFrame[c("Income","Age")])}
 

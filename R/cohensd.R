@@ -12,7 +12,7 @@ calcCohensD <- function(vals, freq, grps,
   ## Args:
   ##   @param vals a numeric vector of values
   ##   @param freq a frequency vector of length equal to the number of records
-  ##     in 'dat' indicating how many times an observation should be drawn
+  ##     in 'data' indicating how many times an observation should be drawn
   ##     from each sample.
   ##   @param grps a grouping vector of the same length as 'vals'
   ##   @param contrast a named, numeric vector of contrast weights.

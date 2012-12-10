@@ -1,2 +1,3 @@
 export(bootES)
 S3method(print, bootES)
+S3method(summary, bootES)
