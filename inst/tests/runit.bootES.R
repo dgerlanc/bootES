@@ -199,6 +199,15 @@ test.bootES.contrast <- function() {
   test = bootES(gender, data.col = "Meas1", group.col = "Gender",
     contrast=c(female = 3, male = -3), effect.type = "hedges.g")
   checkEquals(truth, test$t0, tol=1e-3)
+  
+  gender$GenderByCond = paste(gender$Gender, gender$Condition, sep = "-")
+  set.seed(1)
+  truth = 46.71499
+  test <- bootES(gender, data.col="Meas1", group.col="GenderByCond", 
+                 contrast = c("female-A" = -40, "male-A" = -40, 
+                              "female-B" = -10, "male-B" = -10, 
+                              "female-C" = 50, "male-C" = 50))
+  checkEquals(truth, test$t0, tol=1e-3)
 }
 
 test.bootES.cor.diff <- function() {

@@ -53,7 +53,7 @@ calcUnstandardizedMean <- function(vals, freq, grps, lambdas) {
   }
 
   ## Put means and lambdas in the same order
-  means = means[match(names(means), names(lambdas))]
+  lambdas = lambdas[names(means)]
   res   = sum(lambdas * means)
 }
 
