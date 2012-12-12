@@ -162,6 +162,15 @@ test.bootES.multivariate <- function() {
   
 }
 
+test.bootES.hedges.g <- function() {
+  set.seed(1)
+  truth = 0.5096
+  test  = bootES(gender, data.col = "Meas1", group.col = "Gender", 
+                 contrast = c("female","male"), 
+                 effect.type="hedges.g", glass.control="female")
+  checkEquals(truth, test$t0, tol=1e-3)
+}
+
 test.bootES.contrast <- function() {
 
   ## Assert: Calculated value matches known value for an unstandardized

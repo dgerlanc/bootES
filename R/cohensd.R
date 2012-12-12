@@ -36,6 +36,7 @@ calcCohensD <- function(vals, freq, grps,
   ## group.
   means = ss = numeric()
   glass.sd = NULL
+  dof = NULL
   for (nm in grp.nms) {
     this.grp.idx = grp.idx[[nm]]
     sample.vals  = rep(vals[this.grp.idx], times=freq[this.grp.idx])
@@ -44,27 +45,26 @@ calcCohensD <- function(vals, freq, grps,
 
     if (identical(glass.control, nm)) {
       if (cohens.d.sigma) {
-        denom = length(sample.vals)
+        dof = length(sample.vals)
       } else {
-        denom = length(sample.vals) - 1
+        dof = length(sample.vals) - 1
       }
-      glass.sd = sqrt(ss[nm] / denom)
+      glass.sd = sqrt(ss[nm] / dof)
     }
   }
 
   ## Calculate the standard deviation.
   num.grps     = length(grp.idx)
-  df = if (cohens.d.sigma) length(vals) else length(vals) - num.grps
-  if (!is.null(glass.sd)) {
-    sd.hat = glass.sd
-  } else {    
-    sd.hat = sqrt(sum(ss) / df)
+  if (is.null(dof)) { # dof == NULL when glass.control specified
+    dof = if (cohens.d.sigma) length(vals) else length(vals) - num.grps
   }
+  
+  sd.hat = if (!is.null(glass.sd)) glass.sd else sqrt(sum(ss) / dof)
 
   res = sum(contrast[grp.nms] * means) / sd.hat
   res = as.vector(res) # remove names from 'means'
   if (hedges.g) {
-    hadj = gamma(df/2)/( sqrt(df/2)*gamma((df-1)/2) )
+    hadj = gamma(dof/2)/( sqrt(dof/2)*gamma((dof-1)/2) )
     res  = hadj * res
   }
   return(res)
