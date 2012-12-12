@@ -80,7 +80,7 @@ sum(cvg, na.rm=T)
 set.seed(2)
 u1 <- 5
 s1 <- 1
-reps <- 1000
+reps <- 10000
 mc.sim.4 <- newResultMatrix(reps)
 for (i in seq_len(reps)) {
   cat(i, "\n")
@@ -91,7 +91,8 @@ sum(cvg, na.rm=T)
 
 mc.out <- "bootES.mc.RData"
 if (!file.exists("bootES.mc.RData"))
-save(mc.sim.1, mc.sim.2, mc.sim.3, file="bootES.mc.RData")
+  save(mc.sim.1, mc.sim.2, mc.sim.3, mc.sim.4, file="bootES.mc.RData",
+       compress="xz")
 
 ## Formula for 'r' from 'd'
 ## r <- d / (sqrt(d^2 + 4))
