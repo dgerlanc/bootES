@@ -39,7 +39,7 @@ test.bootES.input <- function() {
   checkTrue(grepl("integer of length 1", res))
   
   ## Use a 'data.col' not in 'data'
-  checkException(bootES(threeGps, R=100, data.col="foo"), silent=TRUE)
+  checkException(bootES(threeGps, R=250, data.col="foo"), silent=TRUE)
 
   ## Use a 'glass.control' value that is not a valid group
   res <- try(bootES(data.frame(scores=1), glass.control="foo"), silent=TRUE)
@@ -62,7 +62,7 @@ test.bootES.univariate <- function() {
   ## Test: 'meanBoot' through 'bootES'
   set.seed(1)
   truth    = mean(threeGps$scores)
-  mean.res = bootES(threeGps, R=1000, data.col="scores",
+  mean.res = bootES(threeGps, R=250, data.col="scores",
     effect.type="unstandardized")
   mean.res.vec = bootES(threeGpsVec, effect.type="unstandardized")
   checkEquals(truth, mean.res$t0)
@@ -71,13 +71,13 @@ test.bootES.univariate <- function() {
   ## Test: 'rMeanBoot' through 'bootES'
   set.seed(1)
   truth     = bootES:::rMean(threeGps$scores)
-  rMean.res = bootES(threeGps, R=1000, data.col="scores", effect.type="r")
+  rMean.res = bootES(threeGps, R=250, data.col="scores", effect.type="r")
   checkEquals(truth, rMean.res$t0)
 
   ## Test: 'dMeanBoot' through 'bootES'
   set.seed(1)
   truth     = bootES:::dMean(threeGps$scores)
-  rMean.res = bootES(threeGps, R=1000, data.col="scores",
+  rMean.res = bootES(threeGps, R=250, data.col="scores",
     effect.type="cohens.d")
   checkEquals(truth, rMean.res$t0)
 
@@ -85,14 +85,14 @@ test.bootES.univariate <- function() {
   set.seed(1)
   truth     = bootES:::dSigmaMeanBoot(threeGps$scores,
     1:length(threeGps$scores))
-  rMean.res = bootES(threeGps, R=1000, data.col="scores",
+  rMean.res = bootES(threeGps, R=250, data.col="scores",
     effect.type="cohens.d.sigma")
   checkEquals(truth, rMean.res$t0)
   
   ## Test: 'hMeanBoot' and Hedge's g through 'bootES'
   set.seed(1)
   truth     = bootES:::hMean(threeGps$scores)
-  rMean.res = bootES(threeGps, R=1000, data.col="scores",
+  rMean.res = bootES(threeGps, R=250, data.col="scores",
     effect.type="hedges.g")
   checkEquals(truth, rMean.res$t0)
     
@@ -112,30 +112,30 @@ test.bootES.multivariate <- function() {
   ## Integration test of stat='contrast' and effect.type='unstandardized'
   set.seed(1)
   truth     = mean(g1) - mean(g2)
-  unstdDiff.res = bootES(twoGpsA, R=1000, data.col="x", group.col="team",
+  unstdDiff.res = bootES(twoGpsA, R=250, data.col="x", group.col="team",
     effect.type="unstandardized", contrast=lambdas)
-  checkEquals(truth, unstdDiff.res$t0)  
-  
+  checkEquals(truth, unstdDiff.res$t0)
+   
   ## Integration test of stat='contrast' and effect.type='unstandardized' where
   ## there is only one group. This should cause an error.
-  unstdDiff.err = try(bootES(twoGpsErr, R=1000, data.col="x", group.col="team",
+  unstdDiff.err = try(bootES(twoGpsErr, R=250, data.col="x", group.col="team",
     effect.type="unstandardized"), silent=TRUE)    
 
   ## Integration test of stat='contrast' and effect.type='cohens.d.sigma'
   set.seed(1)
-  test = bootES(gender, data.col="Meas1", group.col="Gender",
+  test = bootES(gender, R=250, data.col="Meas1", group.col="Gender",
     effect.type="cohens.d.sigma", contrast=c(female=1, male=-1))
   checkEquals(-0.50104, test$t0, tol=1e-2)  
 
   set.seed(1)
-  test = bootES(gender, data.col="Meas1", group.col="Gender",
+  test = bootES(gender, R=250, data.col="Meas1", group.col="Gender",
     effect.type="cohens.d.sigma", contrast=c(female=-1, male=+1))
   checkEquals(0.50104, test$t0, tol=1e-2)  
 
   ## Integration test of stat='contrast' and effect.type='cohens.d.sigma'
   ## w/ glass control
   set.seed(1)
-  test = bootES(gender, data.col="Meas1", group.col="Gender",
+  test = bootES(gender, R=250, data.col="Meas1", group.col="Gender",
     effect.type="cohens.d.sigma", contrast=c('female', 'male'),
     glass.control='female')
   checkEquals(0.588, test$t0, tol=1e-2)
@@ -143,7 +143,7 @@ test.bootES.multivariate <- function() {
   ## Integration test of stat='contrast' and effect.type='cohens.d'
   ## w/ glass control
   set.seed(1)
-  test = bootES(gender, data.col="Meas1", group.col="Gender",
+  test = bootES(gender, R=250, data.col="Meas1", group.col="Gender",
     effect.type="cohens.d", contrast=c('female', 'male'),
     glass.control='female')
   checkEquals(0.557, test$t0, tol=1e-2)
@@ -165,7 +165,7 @@ test.bootES.multivariate <- function() {
 test.bootES.hedges.g <- function() {
   set.seed(1)
   truth = 0.5096
-  test  = bootES(gender, data.col = "Meas1", group.col = "Gender", 
+  test  = bootES(gender, R=250, data.col = "Meas1", group.col = "Gender", 
                  contrast = c("female","male"), 
                  effect.type="hedges.g", glass.control="female")
   checkEquals(truth, test$t0, tol=1e-3)
@@ -177,7 +177,7 @@ test.bootES.contrast <- function() {
   ## contrast
   set.seed(1)
   truth = -522.43
-  test  = bootES(gender, data.col="Meas3", group.col="Condition",
+  test  = bootES(gender, R=250, data.col="Meas3", group.col="Condition",
     contrast = c(A = -40, B = -10, C = 50), scale.weights=FALSE)
   checkEquals(truth, test$t0, tol=1e-2)
 
@@ -185,7 +185,7 @@ test.bootES.contrast <- function() {
   ## contrast with weights scaled
   set.seed(1)
   truth.contrast.scaled = -10.4486
-  test  = bootES(gender, data.col="Meas3", group.col="Condition",
+  test  = bootES(gender, R=250, data.col="Meas3", group.col="Condition",
     contrast = c(A = -40, B = -10, C = 50), scale.weights=TRUE)
   checkEquals(truth.contrast.scaled, test$t0, tol=1e-4)
 
@@ -193,19 +193,19 @@ test.bootES.contrast <- function() {
   ## contrast with weights scaled and a group left out
   set.seed(1)
   truth.contrast.omit = -3.0535
-  test  = bootES(gender, data.col="Meas3", group.col="Condition",
+  test  = bootES(gender, R=250, data.col="Meas3", group.col="Condition",
     contrast = c(A = -1, C = 1))  
   checkEquals(truth.contrast.omit, test$t0, tol=1e-4)
 
   ## Assert: Default weights of -1 and 1 are used when not passed in
-  test.dflt  = bootES(gender, data.col="Meas3", group.col="Condition",
+  test.dflt  = bootES(gender, R=250, data.col="Meas3", group.col="Condition",
     contrast = c('A', 'C'))
   checkEquals(truth.contrast.omit, test.dflt$t0, tol=1e-4)
 
   ## Assert: Scales user-specified weights
   set.seed(1)
   truth = -0.45488
-  test = bootES(gender, data.col = "Meas1", group.col = "Gender",
+  test = bootES(gender, R=250, data.col = "Meas1", group.col = "Gender",
     contrast=c(female = 3, male = -3), effect.type = "hedges.g")
   checkEquals(truth, test$t0, tol=1e-3)
   
@@ -235,11 +235,11 @@ test.bootES.slope <- function() {
   ## Regression test for when effect.type='slope'
   set.seed(1)
   truth <- -0.1244
-  test  <- bootES(gender, data.col="Meas3", group.col="Condition",
+  test  <- bootES(gender, R=200, data.col="Meas3", group.col="Condition",
                   slope.levels=c(A=30, B=60, C=120))
   checkEquals(truth, test$t0, tol=1e-2)
   
-  test  <- bootES(gender, data.col="Meas3", slope.levels="Dosage")
+  test  <- bootES(gender, R=200, data.col="Meas3", slope.levels="Dosage")
   checkEquals(truth, test$t0, tol=1e-2)
                   
 }
@@ -257,7 +257,7 @@ test.bootES.citype <- function() {
   ## Test: 'meanBoot' through 'bootES'
   set.seed(1)
   truth    = mean(threeGps$scores)
-  mean.res = bootES(threeGps, R=1000, data.col="scores",
+  mean.res = bootES(threeGps, R=250, data.col="scores",
     effect.type="unstandardized")
   mean.res.vec = bootES(threeGpsVec, effect.type="unstandardized")
   checkEquals(truth, mean.res$t0)
@@ -268,11 +268,11 @@ test.bootES.citype <- function() {
   for (ci.type in ci.types) {
     set.seed(1)
     if (ci.type == "stud") {
-      . <- bootES(threeGps, R=1000, data.col="scores",
+      . <- bootES(threeGps, R=250, data.col="scores",
                   effect.type="unstandardized", ci.type=ci.type,
                   var.t0=1, var.t=1)
     } else {
-      . <- bootES(threeGps, R=1000, data.col="scores",
+      . <- bootES(threeGps, R=250, data.col="scores",
                   effect.type="unstandardized", ci.type=ci.type)
     }
   }
