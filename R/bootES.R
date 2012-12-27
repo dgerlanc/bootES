@@ -1,7 +1,7 @@
 ## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## High-level function for bootstrap analyses using the 'boot' package
 
-bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
+bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
                      "cohens.d.sigma", "r", "akp.robust.d"),
                    contrast=NULL,
@@ -92,6 +92,18 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
     grps = as.factor(data[[group.col]])
   }  
 
+  ## Check and extract 'block.col'.
+  blocks = NULL
+  if (!is.null(block.col)) {
+    if (!is.character(block.col)) 
+      stop("'block.col' must be a character vector.")
+    
+    if (!block.col %in% colnames(data))
+      stop("'block.col' missing from 'data'")
+    
+    blocks = as.factor(data[[block.col]])
+  }
+  
   ## Checks on scale.weights
   if (!is.logical(scale.weights) || length(scale.weights) != 1)
     stop("'scale.weights' must be a logical vector of length 1.")
@@ -215,6 +227,28 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
     group.col.idx = match(group.col, names(data))
     data = data[, c(num.col.idx, group.col.idx)]
   }    
+  
+  ## Modify the groups and lambdas when a blocking column has been passed:
+  grps.char = if (!is.null(grps)) as.character(grps) else NULL
+  blocks.char = if (!is.null(blocks)) as.character(blocks) else NULL
+  if (!is.null(grps.char) && !is.null(blocks.char)) {
+    block.grps = split(grps.char, blocks.char, drop=TRUE)
+    ## Assert that no blocks contain values from more than one group
+    n.unique.grps = sapply(block.grps, function(x) length(unique(x)))
+    if (isTRUE(any(n.unique.grps > 1)))
+      stop('Blocks cannot contain multiple groups.')
+    block.grps = sapply(block.grps, "[", 1)
+    lmbd.adj = c(table(block.grps))
+
+    ## Adjust lambdas according to the number of blocks per group
+    lmbds = lmbds / lmbd.adj[names(lmbds)]
+    lmbds = lmbds[block.grps]
+    names(lmbds) = names(block.grps)
+    grps = blocks
+    grps.char = blocks.char
+    ## grp.idx = split(seq_along(vals), grps.char, drop=TRUE)
+    ## block.idx = split(seq_along(vals), blocks.char, drop=TRUE)
+  }
   
   ## Error handling for 'glass.control'
   if (!is.null(glass.control)) {
