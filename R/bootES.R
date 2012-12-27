@@ -3,7 +3,7 @@
 
 bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
                    effect.type=c("unstandardized", "cohens.d", "hedges.g",
-                     "cohens.d.sigma", "r"),
+                     "cohens.d.sigma", "r", "akp.robust.d"),
                    contrast=NULL,
                    slope.levels=NULL,
                    glass.control=NULL,
@@ -238,10 +238,16 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
                        cohens.d.sigma = dSigmaMeanBoot)    
     res = boot(vals, statistic=boot.fun, R=R) 
   } else { # Two or more groups
-    if (effect.type %in% c("cohens.d", "hedges.g", "cohens.d.sigma")) {
+    use.cohens.d = effect.type %in% 
+      c("cohens.d", "hedges.g", "cohens.d.sigma", "akp.robust.d")
+    if (use.cohens.d) {
       res = boot(vals, calcCohensD, R, stype="f", strata=grps, grps=grps,
-        contrast=lmbds, cohens.d.sigma=(effect.type == "cohens.d.sigma"),
-        glass.control=glass.control, hedges.g=(effect.type == "hedges.g"))
+                 contrast=lmbds, 
+                 cohens.d.sigma=(effect.type == "cohens.d.sigma"),
+                 glass.control=glass.control, 
+                 hedges.g=(effect.type == "hedges.g"),
+                 akp.robust.d=(effect.type == "akp.robust.d")
+                 )
     } else if (stat == "cor") {
       res = boot(data, statistic=corBoot, R=R) 
     } else if (stat == "cor.diff") {

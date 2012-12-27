@@ -5,7 +5,8 @@ calcCohensD <- function(vals, freq, grps,
                         contrast,
                         hedges.g=FALSE,
                         cohens.d.sigma=FALSE,
-                        glass.control="") {
+                        glass.control="",
+                        akp.robust.d=FALSE) {
   ## Compute Cohen's d/Hedge's g or optionally Cohen's Sigma D for the
   ## mean of one or more groups
   ## 
@@ -40,9 +41,19 @@ calcCohensD <- function(vals, freq, grps,
   for (nm in grp.nms) {
     this.grp.idx = grp.idx[[nm]]
     sample.vals  = rep(vals[this.grp.idx], times=freq[this.grp.idx])
-    means[nm]    = mean(sample.vals)
-    ss[nm]       = sum((sample.vals - means[nm])^2)
-
+    
+    if (akp.robust.d) {
+      means[nm] = mean(sample.vals, trim=0.2)
+      n = length(sample.vals)
+      g = floor(0.2*n) # Trim from bottom and top
+      tdat = sort(sample.vals)[(g+1):(n-g)] # the trimmed data             
+      wdat = c(rep(min(tdat),g), tdat, rep(max(tdat),g))  
+      ss[nm] = sum((wdat - mean(wdat))^2)/0.642^2
+    } else {
+      means[nm] = mean(sample.vals)
+      ss[nm]    = sum((sample.vals - means[nm])^2)
+    }
+    
     if (identical(glass.control, nm)) {
       if (cohens.d.sigma) {
         dof = length(sample.vals)

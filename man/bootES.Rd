@@ -8,7 +8,7 @@
 \usage{
 bootES(data, R=2000, data.col=NULL, group.col=NULL, 
        effect.type = c("unstandardized", "cohens.d", "hedges.g",
-                       "cohens.d.sigma", "r"),
+                       "cohens.d.sigma", "r", "akp.robust.d"),
        contrast = NULL,
        slope.levels = NULL,
        glass.control = NULL,
@@ -43,11 +43,15 @@ bootES(data, R=2000, data.col=NULL, group.col=NULL,
 	
 	The standardized effect-size options are: 
 	"r", which expresses the effect as Pearson's r;
-	"cohens.d" or "hedges.g", both of which express an effect in standard deviation units, where the standard deviation is computed as the sample estimate of the population standard deviation, e.g., sqrt(SS/(n-1)); and
-	"cohens.d.sigma", which expresses an effect in standard deviation units, where the standard deviation of the sample is taken as the population standard deviation, e.g., sqrt(SS/n).
+	"cohens.d" or "hedges.g", both of which express an effect in standard deviation units, where the standard deviation is computed as the sample estimate of the population standard deviation, e.g., sqrt(SS/(n-1));
+	"cohens.d.sigma", which expresses an effect in standard deviation units, where the standard deviation of the sample is taken as the population standard deviation, e.g., sqrt(SS/n); and
+  "akp.robust.d", which expresses an effect in standard deviation units, where
+  the mean of the sample is computed as the trimmed sample estimate of the mean 
+  and the standard deviation is computed as the scaled and winsorized standard
+  deviation of the sample.
 When one of the Cohen's d-type effect sizes are used, the option \code{glass.control = "controlGroupName"} can be used to specify a single group in \code{group.col} that is to be used for computing the standard deviation.
 	
-	When both a \code{data.col} and a \code{group.col} is provided, \code{bootES} computes the between-subjects contrast specified in the \code{contrast} option, in the format \code{contrast = c(...)}.  Within the parentheses each group label that is involved in the contrast is followed by an equal sign and its contrast weight, with groups separated by commas.  For example, to find the difference between the means of females and males one could use the option \code{contrast = c(female=1, male=-1)}.  As a convenience, when only two groups are involved in the contrast, the user may omit the contrast weights but add single or double quotes: for example, \code{contrast = c("female", "male")}. So, for a data frame called "myDataFrame" containing a column called "DV" and a column called "Gender," the gender difference in the DV, and its bootstrap confidence interval, can be found by
+	When both a \code{data.col} and a \code{group.col} is provided, \code{bootES} computes the between-subjects contrast specified in the \code{contrast} option, in the format \code{contrast = c(...)}.  Within the parentheses, each group label that is involved in the contrast is followed by an equal sign and its contrast weight, with groups separated by commas.  For example, to find the difference between the means of females and males one could use the option \code{contrast = c(female=1, male=-1)}.  As a convenience, when only two groups are involved in the contrast, the user may omit the contrast weights but add single or double quotes: for example, \code{contrast = c("female", "male")}. So, for a data frame called "myDataFrame" containing a column called "DV" and a column called "Gender," the gender difference in the DV, and its bootstrap confidence interval, can be found by
 	
 \code{bootES(myDataFrame, data.col="DV", group.col="Gender", contrast=c(female=1, male=-1))}
 	

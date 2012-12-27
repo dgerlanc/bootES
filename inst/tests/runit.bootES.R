@@ -219,6 +219,14 @@ test.bootES.contrast <- function() {
   checkEquals(truth, test$t0, tol=1e-3)
 }
 
+test.bootES.apk.robust.d <- function() {
+  truth = 0.5487
+  test.1 = bootES(gender, R=250, data.col="Meas1", group.col="Gender",
+                  contrast=c(male=1, female=-1), 
+                  effect.type="akp.robust.d")
+  checkEquals(test.1$t0, truth, tol=1e-3)
+}
+
 test.bootES.cor.diff <- function() {
   ## Integration test of stat='cor.diff'
   ## Note: Tests variable ordering of numberic and group columns.
