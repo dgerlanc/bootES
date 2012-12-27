@@ -250,7 +250,7 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL,
       res = boot(vals, calcSlope, R=R, stype="f", strata=grps,
         grps=grps, lambdas=lmbds)
     } else if (stat == "mean" && effect.type == "unstandardized") {
-      res = boot(vals, meanUnstandardizedMean, R, stype="f", 
+      res = boot(vals, meanUnweightedBoot, R, stype="f", 
                  strata=grps, grps=grps)
     } else if (stat == "contrast" && effect.type == "unstandardized") {
       res = boot(vals, calcUnstandardizedMean, R, stype="f", strata=grps,
