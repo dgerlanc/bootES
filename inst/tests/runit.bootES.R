@@ -2,8 +2,10 @@
 ## Input and regression tests for the bootES function
 
 test.AAA <- function() {
-  gender <<- read.csv(system.file("example.csv", package="bootES"),
+  gender <- read.csv(system.file("example.csv", package="bootES"),
                       strip.white=TRUE, header=TRUE)
+  gender$GenderByCond <- paste(gender$Gender, gender$Condition, sep = "-")
+  gender <<- gender  
 }
 
 test.bootES.input <- function() {
@@ -217,6 +219,14 @@ test.bootES.contrast <- function() {
                               "female-B" = -10, "male-B" = -10, 
                               "female-C" = 50, "male-C" = 50))
   checkEquals(truth, test$t0, tol=1e-3)
+
+  ## Assert: Test the blocking column
+  set.seed(1)
+  truth = 46.71499
+  test = bootES(gender, R=250, data.col="Meas1",
+    block.col="GenderByCond", group.col="Condition",
+    contrast=c(A=-40, B=-10, C=50))
+  checkEquals(truth, test$t0, tol=1e-3)
 }
 
 test.bootES.cor.diff <- function() {
@@ -277,3 +287,46 @@ test.bootES.citype <- function() {
     }
   }
 }
+
+test.blocking <- function() {
+  
+  ## testgroup: Calls calcUnstandardizedMean through the bootES interface
+  
+  ## Assert that blocking and grouping work exactly the same when the 
+  ## contrasts are specified at the block or group level
+
+  set.seed(1)
+  test.1a = bootES(gender, R=999, data.col="Meas1", group.col="Gender", 
+                   contrast=c(female=-1, male=1), block.col="GenderByCond")
+  
+  set.seed(1)
+  test.1b = bootES(gender, R=999, 
+                   data.col = "Meas1", group.col = "GenderByCond", 
+                   contrast = c("female-A"=-1, "female-B"=-1, "female-C"=-1, 
+                                "male-A"=1, "male-B"=1, "male-C"=1))
+  
+  checkEquals(summary(test.1a), summary(test.1b))
+  
+  ## testgroup: Calls calcCohensD through the bootES interface
+  set.seed(1)
+  test.2a = bootES(gender, R=999, data.col="Meas1", group.col="Gender", 
+                   contrast=c(female=-1, male=1), block.col="GenderByCond",
+                   effect.type="cohens.d")
+  
+  set.seed(1)
+  test.2b = bootES(gender, R=999, effect.type="cohens.d",
+                   data.col = "Meas1", group.col = "GenderByCond", 
+                   contrast = c("female-A"=-1, "female-B"=-1, "female-C"=-1, 
+                                "male-A"=1, "male-B"=1, "male-C"=1))
+  checkEquals(summary(test.1a), summary(test.1b))
+  
+  ## test: Assert that specifying two columns without crossing them
+  ##       generates an error
+  set.seed(1)
+  test.3 = try(bootES(gender, R=999, data.col="Meas1", group.col="Gender", 
+                      contrast=c(female=-1, male=1), block.col="Condition"),
+               silent=TRUE)
+  checkTrue(inherits(test.3, "try-error"))
+  
+}
+

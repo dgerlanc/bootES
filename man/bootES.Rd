@@ -6,7 +6,7 @@
   
 }
 \usage{
-bootES(data, R=2000, data.col=NULL, group.col=NULL, 
+bootES(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL, 
        effect.type = c("unstandardized", "cohens.d", "hedges.g",
                        "cohens.d.sigma", "r"),
        contrast = NULL,
@@ -24,6 +24,8 @@ bootES(data, R=2000, data.col=NULL, group.col=NULL,
   \item{R}{The number of bootstrap resamples to perform.}
   \item{data.col}{The name of the column in \code{data} containing the sample values (the "dependent" or "outcome" variable).}
   \item{group.col}{The name of the column in \code{data} containing the categorical group labels (the "independent" or "categorical predictor" variable).}
+  \item{block.col}{The name of the column in \code{data} containing the 
+  categorical group labels for blocking.}
   \item{effect.type}{Specifies the type of effect-size measure to estimate. The default is "unstandardized".}
   \item{contrast}{A named vector that pairs group labels with their contrast weights. See below for usage.}
   \item{scale.weights}{When TRUE (the default), the contrast weights are scaled so that the unstandardized contrast expresses the effect in the original units of measurement. When FALSE, the magnitude of an unstandardized contrast is a function of the scale of the contrast weights.}
