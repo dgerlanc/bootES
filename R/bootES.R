@@ -232,6 +232,8 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
   grps.char = if (!is.null(grps)) as.character(grps) else NULL
   blocks.char = if (!is.null(blocks)) as.character(blocks) else NULL
   if (!is.null(grps.char) && !is.null(blocks.char)) {
+    blocks.char = paste(grps.char, blocks.char, sep="-")
+    blocks = as.factor(blocks.char)
     block.grps = split(grps.char, blocks.char, drop=TRUE)
     ## Assert that no blocks contain values from more than one group
     n.unique.grps = sapply(block.grps, function(x) length(unique(x)))

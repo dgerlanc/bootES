@@ -328,13 +328,11 @@ test.blocking <- function() {
                                 "male-A"=1, "male-B"=1, "male-C"=1))
   checkEquals(summary(test.1a), summary(test.1b))
   
-  ## test: Assert that specifying two columns without crossing them
-  ##       generates an error
+  ## test: Assert that bootES automatically crosses them
   set.seed(1)
-  test.3 = try(bootES(gender, R=999, data.col="Meas1", group.col="Gender", 
-                      contrast=c(female=-1, male=1), block.col="Condition"),
-               silent=TRUE)
-  checkTrue(inherits(test.3, "try-error"))
+  test.3 = bootES(gender, R=999, data.col="Meas1", group.col="Gender", 
+                  contrast=c(female=-1, male=1), block.col="Condition")
+  checkEquals(summary(test.3), summary(test.1a))
   
 }
 
