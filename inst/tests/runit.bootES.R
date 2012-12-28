@@ -46,6 +46,26 @@ test.bootES.input <- function() {
   ## Use a 'glass.control' value that is not a valid group
   res <- try(bootES(data.frame(scores=1), glass.control="foo"), silent=TRUE)
   checkTrue(grepl("'glass.control' is not", res))
+  
+  ## Assert that using a block.col and glass.control together generates
+  ## an error
+  res <- try(bootES(gender, 
+                    data.col="Meas1",
+                    block.col="Gender", group.col="Condition",
+                    glass.control="female",
+                    contrast=c(A=1, B=-0.5, C=-0.5)), 
+             silent=TRUE)
+  checkTrue(grepl("Cannot use 'block.col'", res))
+  
+  ## Use 'glass.control' and 'block.col' together w/out a data column
+  ## and w/out contrasts
+  res <- try(bootES(gender, block.col="Gender", grp.col="Condition"), 
+             silent=TRUE)
+  
+  ## Use 'glass.control' and 'block.col' together w/out a data column
+  res <- try(bootES(gender, block.col="Gender", group.col="Condition",
+                    contrast=c(A=1, B=-0.5, C=-0.5)), 
+             silent=TRUE)
 }
 
 test.bootES.univariate <- function() {
