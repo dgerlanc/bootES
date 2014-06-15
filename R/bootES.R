@@ -253,6 +253,14 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
     grps.char = blocks.char
     ## grp.idx = split(seq_along(vals), grps.char, drop=TRUE)
     ## block.idx = split(seq_along(vals), blocks.char, drop=TRUE)
+  } else if (is.null(grps.char) && !is.null(blocks.char)) {
+    grps <- as.factor(blocks.char)
+    grps.char <- blocks.char
+    n.by.grp <- c(table(grps.char))
+    if (is.null(lmbds)) {
+      lmbds <- structure(rep(1 / length(n.by.grp), length(n.by.grp)),
+                         names=names(n.by.grp))
+    }
   }
   
   ## Error handling for 'glass.control'

@@ -240,13 +240,36 @@ test.bootES.contrast <- function() {
                               "female-C" = 50, "male-C" = 50))
   checkEquals(truth, test$t0, tol=1e-3)
 
-  ## Assert: Test the blocking column
+  ## Assert: Test the blocking column w/ contrasts that must be scaled
   set.seed(1)
   truth = 46.71499
   test = bootES(gender, R=250, data.col="Meas1",
     block.col="GenderByCond", group.col="Condition",
     contrast=c(A=-40, B=-10, C=50))
   checkEquals(truth, test$t0, tol=1e-3)
+  
+  ## Assert: Test the blocking column w/ contrasts that don't need to
+  ## be scaled
+  set.seed(1)
+  truth = 36.783
+  test <- bootES(gender, R=250, data.col="Meas1", group.col="Gender",
+                 contrast=c("female"=-1, "male"=1), block.col="Condition")
+  checkEquals(truth, test$t0, tol=1e-3)
+  cond_means <- with(gender, tapply(Meas1, GenderByCond, mean))
+  
+  ## Assert: Test that means are unweighted
+  set.seed(1005)
+  # means <- with(gender, tapply(Meas1, Condition, mean))
+  # truth <- with(gender, mean(tapply(Meas1, Condition, mean)))
+  truth <- 266.944 # unweighted mean 
+  test <- bootES(gender, R=250, data.col="Meas1", block.col="Condition")
+  checkEquals(truth, test)
+#   wt_mean <- local({
+#     means <- with(gender, tapply(Meas1, GenderByCond, mean))
+#     counts <- with(gender, tapply(Meas1, GenderByCond, length))
+#     sum(means * counts / nrow(gender))
+#   })
+
 }
 
 test.bootES.apk.robust.d <- function() {
