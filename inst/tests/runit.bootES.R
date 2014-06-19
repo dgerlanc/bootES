@@ -263,7 +263,7 @@ test.bootES.contrast <- function() {
   # truth <- with(gender, mean(tapply(Meas1, Condition, mean)))
   truth <- 266.944 # unweighted mean 
   test <- bootES(gender, R=250, data.col="Meas1", block.col="Condition")
-  checkEquals(truth, test)
+  checkEquals(truth, test$t0, tol=1e-3)
 #   wt_mean <- local({
 #     means <- with(gender, tapply(Meas1, GenderByCond, mean))
 #     counts <- with(gender, tapply(Meas1, GenderByCond, length))
