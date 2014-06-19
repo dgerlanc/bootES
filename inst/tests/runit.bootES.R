@@ -66,6 +66,14 @@ test.bootES.input <- function() {
   res <- try(bootES(gender, block.col="Gender", group.col="Condition",
                     contrast=c(A=1, B=-0.5, C=-0.5)), 
              silent=TRUE)
+  
+  ## Assert that user cannot pass '...' arguments that are not valid 'boot'
+  ## arguments.
+  res <- try(bootES(gender, R=10, data.col="Meas1", block.col="Condition", 
+                    slop.levels=letters[1:3]), 
+             silent=TRUE)
+  checkTrue(grepl('invalid argument.*slop\\.levels', res[1], ignore.case=TRUE))
+
 }
 
 test.bootES.univariate <- function() {

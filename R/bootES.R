@@ -18,7 +18,7 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
   ## effect sizes.
   ##
   ## Args:
-  ##   data           : a vector or data frame containing the one or more
+  ##   data          : a vector or data frame containing the one or more
   ##                   columns of values (required), group labels (optional),
   ##                   and contrast (optional) for each sample
   ##   R             : the number of bootstrap 'repetitions' to perform
@@ -108,6 +108,24 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
   if (!is.logical(scale.weights) || length(scale.weights) != 1)
     stop("'scale.weights' must be a logical vector of length 1.")
 
+  ## Assert that ... arguments are valid 'bootES' arguments
+  dot.args = list(...)
+  if (length(dot.args)) {
+    dot.names = names(dot.args)
+    valid.args = unique(names(c(formals(boot), formals(boot.ci))))
+    invalid.args = setdiff(dot.names, valid.args)
+    if (length(invalid.args)) {
+      msg = sprintf("Invalid arguments to bootES: %s",
+                    paste0(sQuote(invalid.args), collapse=", "))
+      stop(msg)
+    }
+    
+    if ('type' %in% dot.names) {
+      stop("'type' must be specified as 'ci.type'")
+    }
+    
+  }
+  
   ## Process arguments for slope calculations
   lmbds = NULL
   lmbds.orig = contrast
