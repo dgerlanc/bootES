@@ -125,7 +125,17 @@ test.bootES.univariate <- function() {
   rMean.res = bootES(threeGps, R=250, data.col="scores",
     effect.type="hedges.g")
   checkEquals(truth, rMean.res$t0)
-    
+  
+  ## Test: 'akpRobustD' through 'bootES'
+  dat = read.csv(system.file("robust_d_test.csv", package="bootES"))
+  truth     = 0.190912
+  set.seed(1)
+  akp.res = bootES(dat, R=250, data.col="diff", effect.type="akp.robust.d")
+  checkEquals(truth, akp.res$t0, tol=1e-4)
+  
+  set.seed(1)
+  akp.res.1 = bootES(dat[["diff"]], R=250, effect.type="akp.robust.d")
+  checkEquals(truth, akp.res.1$t0, tol=1e-4)
 }
 
 test.bootES.multivariate <- function() {

@@ -300,6 +300,7 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
                        r              = rMeanBoot,
                        hedges.g       = hMeanBoot,
                        cohens.d       = dMeanBoot,
+                       akp.robust.d   = akpRobustD,
                        cohens.d.sigma = dSigmaMeanBoot)    
     res = boot(vals, statistic=boot.fun, R=R) 
   } else { # Two or more groups

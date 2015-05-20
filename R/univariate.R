@@ -48,7 +48,24 @@ dSigmaMeanBoot <- function(x, i)
 rMeanBoot <- function(x, i)
   mean(x[i]) / sqrt(mean(x[i])^2 + sum((x[i] - mean(x[i]))^2) / length(x[i]))
 
+akpRobustD <- function(x, i) {
+  ## Compute AKP Robust D using indexed values within a vector 
+  ## 
+  ## Args:
+  ##   @param x a numeric vector of values
+  ##   @param i an integer vector indexing _x_
 
+  sample.vals = x[i]
+  means = mean(sample.vals, trim=0.2)
+  n = length(sample.vals)
+  g = floor(0.2*n) # Trim from bottom and top
+  tdat = sort(sample.vals)[(g+1):(n-g)] # the trimmed data
+  wdat = c(rep(min(tdat), g), tdat, rep(max(tdat), g))  
+  ss = sum((wdat - mean(wdat))^2)/0.642^2
 
-
+  dof = n - 1
+  sd.hat = sqrt(sum(ss) / dof)
+  res = sum(means / sd.hat)
+  res
+}
 

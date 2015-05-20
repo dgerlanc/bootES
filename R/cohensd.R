@@ -23,6 +23,8 @@ calcCohensD <- function(vals, freq, grps,
   ##     deviation instead of the sample standard deviation
   ##   @param glass.control a character vector of length 1 specifying the
   ##     optional group to use to calculate standard deviation
+  ##   @param akp.robust.d logical scalar if robust version of Cohen's D should
+  ##     be used
   ##
   ## Details:
   ##   This function is meant to be passed as the 'statistic' argument to the
