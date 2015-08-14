@@ -81,5 +81,9 @@ When a third column with two groups is included, and that column is specified as
 }
 
 \value{An object of class \code{c('bootES', 'boot')}}
+\examples{
+bootES(1:10, R=1000)
+}
+
 \author{Daniel Gerlanc and Kris Kirby}
 

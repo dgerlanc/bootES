@@ -1,8 +1,9 @@
 importFrom(boot, boot)
 importFrom(boot, boot.ci)
 importFrom(graphics, plot)
-importFrom(stats, sd)
 importFrom(stats, cor)
+importFrom(stats, sd)
+importFrom(stats, var)
 
 export(bootES)
 S3method(print, bootES)
