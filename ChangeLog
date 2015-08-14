@@ -1,0 +1,7 @@
+Version: 1.2 (2015-08-14, released)
+
+	* Fixed bug in akp.robust.d.
+	
+	* Update NAMESPACE to import from boot, graphics, and stats
+
+	* Update package description to be a complete sentence.

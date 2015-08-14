@@ -1,12 +1,12 @@
 Package:  bootES
-Version:  1.01
-Date:  2012-12-31
+Version:  1.2
+Date:  2015-08-14
 Depends:  R (>= 2.10.1), boot
 Imports:  stats, graphics
 Title:  Bootstrap Effect Sizes
 Author:  Daniel Gerlanc <dgerlanc@enplusadvisors.com> and Kris Kirby <kkirby@williams.edu>
 Maintainer:  Daniel Gerlanc <dgerlanc@enplusadvisors.com>
-Description:  Functions for calculating bootstrap effect sizes
+Description:  Calculate robust measures of effect sizes using the bootstrap.
 License:  GPL (>= 2)
-URL: http://www.enplusadvisors.com
+URL:  http://www.enplusadvisors.com
 
