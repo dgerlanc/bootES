@@ -1,12 +1,13 @@
-Package:  bootES
-Version:  1.2
-Date:  2015-08-14
-Depends:  R (>= 2.10.1), boot
-Imports:  stats, graphics
-Title:  Bootstrap Effect Sizes
-Author:  Daniel Gerlanc <dgerlanc@enplusadvisors.com> and Kris Kirby <kkirby@williams.edu>
-Maintainer:  Daniel Gerlanc <dgerlanc@enplusadvisors.com>
-Description:  Calculate robust measures of effect sizes using the bootstrap.
-License:  GPL (>= 2)
-URL:  http://www.enplusadvisors.com
-
+Package: bootES
+Title: Bootstrap confidence intervals on effect sizes
+Version: 1.2.1
+Depends: R (>= 3.0.0), boot
+Imports: stats
+Suggests: RUnit, graphics
+Authors@R: as.person(c(
+    "Daniel Gerlanc <dan@gerlanc.com> [aut, cre]",
+    "Kris Kirby <kkirby@hush.com> [aut]"
+  ))
+License: GPL-3
+Description: Calculate robust measures of effect sizes using the bootstrap.
+URL: https://github.com/dgerlanc/bootES/
