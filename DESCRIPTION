@@ -1,13 +1,20 @@
 Package: bootES
-Title: Bootstrap confidence intervals on effect sizes
+Title: Bootstrap Confidence Intervals on Effect Sizes
 Version: 1.2.1
 Depends: R (>= 3.0.0), boot
 Imports: stats
 Suggests: RUnit, graphics
-Authors@R: as.person(c(
-    "Daniel Gerlanc <dan@gerlanc.com> [aut, cre]",
-    "Kris Kirby <kkirby@hush.com> [aut]"
-  ))
-License: GPL-3
+Authors@R: c(
+     person(
+        "Daniel",
+        "Gerlanc",
+        role=c("aut", "cre"),
+        email="dan@gerlanc.com"),
+     person(
+        "Kris",
+        "Kirby",
+        role="aut",
+        email="kkirby@hush.com"))
+License: MIT + file LICENSE
 Description: Calculate robust measures of effect sizes using the bootstrap.
 URL: https://github.com/dgerlanc/bootES/
