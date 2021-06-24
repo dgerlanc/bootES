@@ -17,4 +17,5 @@ Authors@R: c(
         email="kkirby@hush.com"))
 License: GPL (>= 2)
 Description: Calculate robust measures of effect sizes using the bootstrap.
-URL: https://github.com/dgerlanc/bootES/
+URL: https://github.com/dgerlanc/bootES
+BugReports: https://github.com/dgerlanc/bootES/issues
