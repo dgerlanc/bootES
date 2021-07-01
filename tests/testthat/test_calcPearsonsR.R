@@ -1,8 +1,7 @@
 ## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Input and regression tests for the calcPearsonsR function
 
-test.calcPearsonsR <- function() {
-  ## Test the functioning of calcPearsonsR function
+test_that("calcPearsonsR produces known result", {
 
   ## Create 2-group data.frame.
   g1        = c(11, 12, 13, 14, 15)
@@ -23,5 +22,5 @@ test.calcPearsonsR <- function() {
   set.seed(1)
   truth = 0.9452
   r.res = bootES:::calcPearsonsR(threeGpsVec, freq=rep(1, length(threeGpsVec)), grps=grpLabels3, lambdas=lambdas3)
-  checkEquals(truth, r.res, tol=1e-4)
-}
+  expect_equal(truth, r.res, tolerance=1e-4)
+})

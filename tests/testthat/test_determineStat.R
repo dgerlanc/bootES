@@ -1,4 +1,6 @@
-test.determineStat <- function() {
+## Daniel Gerlanc and Kris Kirby (2010-2021)
+
+test_that("determineStat calculates correct statistic to use", {
   ## Test the function that determines which statistic to use
   g1        = c(11, 12, 13, 14, 15)
   g2        = c(26, 27, 28, 29)
@@ -13,7 +15,7 @@ test.determineStat <- function() {
   test.input  = data.frame(score=c(g1, g2))
   test.result <- bootES:::determineStat(test.input,
                                         effect.type="unstandardized")
-  checkEquals(test.result, 'mean')
+  expect_equal(test.result, 'mean')
 
   ## Assert that Three Groups, One Measure, Unstandardized yields mean
   ## Assert: stat is mean
@@ -21,7 +23,7 @@ test.determineStat <- function() {
   test.result <- bootES:::determineStat(test.input$score,
                                         grps=test.input$group,
                                         effect.type="unstandardized")
-  checkEquals(test.result, 'mean')
+  expect_equal(test.result, 'mean')
 
   ## 1.2.r One Group, Two Measures on Two Different Dependent Variables
   ## Assert: stat is slope
@@ -30,18 +32,18 @@ test.determineStat <- function() {
                                         data.col=test.input$x,
                                         grps=test.input$y,
                                         effect.type='slope')
-  checkEquals(test.result, 'slope')
+  expect_equal(test.result, 'slope')
       
   ## Assert: stat is contrast
   test.input = data.frame(score=c(g1, g2), group=grpLabels)
   test.result <- bootES:::determineStat(test.input,
                                         grps=grpLabels,
                                         contrast=lambdas)
-  checkEquals(test.result, 'contrast')
+  expect_equal(test.result, 'contrast')
     
-}
+})
 
-test.determineStat.cor <- function() {
+test_that("correct statistic used for correlation", {
   g1 = c(11, 12, 13, 14, 15)
   g2 = c(26, 27, 28, 29)
   
@@ -49,16 +51,16 @@ test.determineStat.cor <- function() {
   test.input  <- data.frame(x=c(g1, g2), y=c(-g1, -g2))
   test.result <- bootES:::determineStat(test.input,
                                         effect.type="r")
-  checkEquals(test.result, 'cor')
+  expect_equal(test.result, 'cor')
 
   ## Assert: stat is cor when effect.type 'unstandardized' is selected
   test.input  <- data.frame(x=c(g1, g2), y=c(-g1, -g2))
   test.result <- bootES:::determineStat(test.input,
                                         effect.type="unstandardized")
-  checkEquals(test.result, 'cor')
-}
+  expect_equal(test.result, 'cor')
+})
 
-test.determineStat.cor.diff <- function() {
+test_that("correct statistic used for cor.diff", {
   g1 = c(11, 12, 13, 14, 15)
   g2 = c(26, 27, 28, 29)
   grpLabels = rep(c("A", "B"), times=c(length(g1), length(g2)))
@@ -68,5 +70,5 @@ test.determineStat.cor.diff <- function() {
   test.result <- bootES:::determineStat(test.input,
                                         grps=test.input$group,
                                         effect.type="r")
-  checkEquals(test.result, 'cor.diff')
-}
+  expect_equal(test.result, 'cor.diff')
+})

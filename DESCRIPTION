@@ -7,8 +7,8 @@ Depends:
 Imports:
     stats
 Suggests:
-    graphics,
-    RUnit
+    testthat (>= 3.0.0),
+    graphics
 Authors@R: c(
      person(
         "Daniel",
@@ -24,3 +24,4 @@ License: GPL (>= 2)
 Description: Calculate robust measures of effect sizes using the bootstrap.
 URL: https://github.com/dgerlanc/bootES
 BugReports: https://github.com/dgerlanc/bootES/issues
+Config/testthat/edition: 3
