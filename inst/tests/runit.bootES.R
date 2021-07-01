@@ -299,14 +299,21 @@ test.bootES.apk.robust.d <- function() {
 }
 
 test.bootES.cor.diff <- function() {
-  ## Integration test of stat='cor.diff'
-  ## Note: Tests variable ordering of numberic and group columns.
+  ## Unit test of stat='cor.diff'
+  ## Note that R=300 set so runs quickly but does not generate warnings
+  ## when calculating CIs
   set.seed(1)
-  a1 = c(1:5, -(1:5))
-  a2 = c(10:14, 10:14)
-  twoGps       = data.frame(group=rep(c(1, 2), each=5), a1, a2)
-  truth        = cor(a1[1:5], a2[1:5]) - cor(a1[6:10], a2[6:10])
-  cor.diff.res = bootES(twoGps, R=10, group.col="group", effect.type="r")
+
+  iris = get(data("iris"))
+  cols = c("Species", "Sepal.Length", "Petal.Length")
+  iris_sv = iris[iris$Species %in% c("setosa", "versicolor"), cols]
+  iris_ls = split(iris_sv, iris_sv$Species)
+  setosa = iris_ls[["setosa"]]
+  versicolor = iris_ls[["versicolor"]]
+  truth = (cor(setosa$Sepal.Length, setosa$Petal.Length) -
+    cor(versicolor$Sepal.Length, versicolor$Petal.Length))
+
+  cor.diff.res = bootES(iris_sv, R=300, group.col="Species", effect.type="r")
   checkEquals(truth, cor.diff.res$t0)
 }
 
