@@ -1,7 +1,8 @@
 ## Daniel Gerlanc and Kris Kirby (2010-2012)
 ## Input and regression tests for the calcCohensD function
 
-test.calcCohensD <- function() {
+
+test_that("calcCohensD produces known result", {
   ## Test the functioning of calcCohensD function
 
   ## Create 2-group data.frame.
@@ -17,30 +18,30 @@ test.calcCohensD <- function() {
   d.res = bootES:::calcCohensD(twoGpsVec, freq=freqVec, grps=grpLabels,
     contrast=lambdas)  
   
-  checkEquals(truth, d.res, tol=1e-4)
+  expect_equal(truth, d.res, tolerance=1e-4)
   
   d.res.switched = bootES:::calcCohensD(twoGpsVec, freq=freqVec,
     grps=grpLabels, contrast=c(A=-1, B=1))
-  checkEquals(-1 * truth, d.res.switched, tol=1e-4)
+  expect_equal(-1 * truth, d.res.switched, tolerance=1e-4)
   
   ## Regression test of calcCohensD w/ cohens.d.sigma=TRUE
   truth = (mean(g1) - mean(g2)) / bootES:::pooledSD(twoGpsVec, grpLabels,
                                                     pop.sd=TRUE)
   d.res = bootES:::calcCohensD(twoGpsVec, freq=freqVec, grps=grpLabels,
     contrast=lambdas, cohens.d.sigma=TRUE)
-  checkEquals(truth, d.res, tol=1e-4)
+  expect_equal(truth, d.res, tolerance=1e-4)
   
   ## Regression test of calcCohensD w/ glass.control=TRUE
   truth = (mean(g1) - mean(g2)) / sqrt(sum(((g1 - mean(g1))^2) / length(g1)))
   d.res.glass = bootES:::calcCohensD(twoGpsVec, freq=freqVec,
     grps=grpLabels, contrast=lambdas, cohens.d.sigma=TRUE, glass.control="A")
 
-  checkEquals(truth, d.res.glass, tol=1e-4)
+  expect_equal(truth, d.res.glass, tolerance=1e-4)
   
   ## Regression test of calcCohensD w/ glass.control=TRUE and
   ## cohens.d.sigma=FALSE
   truth = (mean(g1) - mean(g2)) / sd(g1)
   d.res.glass = bootES:::calcCohensD(twoGpsVec, freq=freqVec,
     grps=grpLabels, contrast=lambdas, cohens.d.sigma=FALSE, glass.control="A")
-  checkEquals(truth, d.res.glass, tol=1e-4)
-}
+  expect_equal(truth, d.res.glass, tolerance=1e-4)
+})
