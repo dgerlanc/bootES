@@ -1,6 +1,6 @@
 Package: bootES
 Title: Bootstrap Confidence Intervals on Effect Sizes
-Version: 1.2
+Version: 1.2.1
 Depends:
     R (>= 3.0.0),
     boot
