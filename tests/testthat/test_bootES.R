@@ -101,13 +101,13 @@ test_that("univariate statistics produce known results with bootES", {
   ## Test: 'rMeanBoot' through 'bootES'
   set.seed(1)
   truth     = bootES:::rMean(threeGps$scores)
-  rMean.res = bootES(threeGps, R=250, data.col="scores", effect.type="r")
+  rMean.res = bootES(threeGps, R=300, data.col="scores", effect.type="r")
   expect_equal(truth, rMean.res$t0)
 
   ## Test: 'dMeanBoot' through 'bootES'
   set.seed(1)
   truth     = bootES:::dMean(threeGps$scores)
-  rMean.res = bootES(threeGps, R=250, data.col="scores",
+  rMean.res = bootES(threeGps, R=300, data.col="scores",
     effect.type="cohens.d")
   expect_equal(truth, rMean.res$t0)
 
@@ -115,14 +115,14 @@ test_that("univariate statistics produce known results with bootES", {
   set.seed(1)
   truth     = bootES:::dSigmaMeanBoot(threeGps$scores,
     1:length(threeGps$scores))
-  rMean.res = bootES(threeGps, R=250, data.col="scores",
+  rMean.res = bootES(threeGps, R=300, data.col="scores",
     effect.type="cohens.d.sigma")
   expect_equal(truth, rMean.res$t0)
   
   ## Test: 'hMeanBoot' and Hedge's g through 'bootES'
   set.seed(1)
   truth     = bootES:::hMean(threeGps$scores)
-  rMean.res = bootES(threeGps, R=250, data.col="scores",
+  rMean.res = bootES(threeGps, R=300, data.col="scores",
     effect.type="hedges.g")
   expect_equal(truth, rMean.res$t0)
   
