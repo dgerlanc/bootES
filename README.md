@@ -6,6 +6,10 @@ bootES
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bootES)](https://cran.r-project.org/package=bootES)
 [![R-CMD-check](https://github.com/dgerlanc/bootes/workflows/R-CMD-check/badge.svg)](https://github.com/dgerlanc/bootes/actions)
+[![downloads](https://cranlogs.r-pkg.org/badges/bootes)](https://www.rdocumentation.org/trends)
+[![CRAN usage](https://jangorecki.gitlab.io/rdeps/bootes/CRAN_usage.svg?sanitize=true)](https://gitlab.com/jangorecki/rdeps)
+[![BioC usage](https://jangorecki.gitlab.io/rdeps/bootes/BioC_usage.svg?sanitize=true)](https://gitlab.com/jangorecki/rdeps)
+[![indirect usage](https://jangorecki.gitlab.io/rdeps/bootes/indirect_usage.svg?sanitize=true)](https://gitlab.com/jangorecki/rdeps)
 <!-- badges: end -->
 
 
