@@ -64,10 +64,22 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
     stop("'data' contains no records!")
   
   ## Checks on 'R'.
+  r.check.message = paste0(
+    "R must be of 'type' integer or 'type' real with no ",
+    "fractional or decimal parts")
+
+  # run this first to provide clear error messages to users
+  if (!is.numeric(R))
+    stop(r.check.message)
+
+  if (!isTRUE(all.equal(floor(R), R)))
+    stop(r.check.message)
+
   R = as.integer(R)
-  r.is.valid = (length(R) == 1) && is.numeric(R) && R > 0
+
+  r.is.valid = (length(R) == 1) && R >= 1
   if (!r.is.valid)
-    stop("R must be an integer of length 1 and greater than 0")
+    stop("R must be of length 1 and >= 1")
   
   ## Check and extract 'data.col'.
   if (!is.null(data.col)) {

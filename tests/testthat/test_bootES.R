@@ -8,6 +8,23 @@ get_gender <- function() {
   gender
 }
 
+test_that("bootES handles invalid 'R' values", {
+  r_check_message = paste0(
+    "R must be of 'type' integer or 'type' real with no ",
+    "fractional or decimal parts")
+
+  ## Pass an 'R' with a fractional portion
+  res <- try(bootES(data.frame(scores=1), R=0.5), silent=TRUE)
+  expect_true(grepl(r_check_message, res))
+
+  ## Pass an 'R' with string
+  res <- try(bootES(data.frame(scores=1), R="5"), silent=TRUE)
+  expect_true(grepl(r_check_message, res))
+
+  ## Pass an 'R' with a negative value
+  res <- try(bootES(data.frame(scores=1), R=-1), silent=TRUE)
+  expect_true(grepl("R must be of length 1 and >= 1", res))
+})
 
 test_that("bootES handles invalid inputs", {
   gender = get_gender()
@@ -36,11 +53,7 @@ test_that("bootES handles invalid inputs", {
   
   ## Pass an 'R' of length greater than 1
   expect_error(bootES(data.frame(scores=1), R=c(2, 1)))
-  
-  ## Pass an 'R' with a fractional portion
-  res <- try(bootES(data.frame(scores=1), R=0.5), silent=TRUE)
-  expect_true(grepl("integer of length 1", res))
-  
+
   ## Use a 'data.col' not in 'data'
   expect_error(bootES(threeGps, R=250, data.col="foo"))
 
