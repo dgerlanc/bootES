@@ -23,7 +23,7 @@ test_that("bootES handles invalid 'R' values", {
 
   ## Pass an 'R' with a negative value
   res <- try(bootES(data.frame(scores=1), R=-1), silent=TRUE)
-  expect_true(grepl("R must be of length 1 and >= 1", res))
+  expect_true(grepl("R must be of length 1 and >= 0", res))
 })
 
 test_that("bootES handles invalid inputs", {

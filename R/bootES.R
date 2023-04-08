@@ -77,9 +77,9 @@ bootES <- function(data, R=2000, data.col=NULL, group.col=NULL, block.col=NULL,
 
   R = as.integer(R)
 
-  r.is.valid = (length(R) == 1) && R >= 1
+  r.is.valid = (length(R) == 1) && R >= 0
   if (!r.is.valid)
-    stop("R must be of length 1 and >= 1")
+    stop("R must be of length 1 and >= 0")
   
   ## Check and extract 'data.col'.
   if (!is.null(data.col)) {
