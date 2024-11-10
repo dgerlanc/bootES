@@ -18,7 +18,7 @@ calcPearsonsR <- function(vals, freq, grps, lambdas) {
   ##   This function is meant to be passed as the 'statistic' argument
   ##   to the 'boot' function. 'freq' should be a frequency vector of
   ##   the type returned by 'boot'
-  
+
   ## Get the integer indices of the different groups.
   grp.idx = split(seq_along(vals), grps, drop=TRUE)   
   grp.nms = names(grp.idx)
@@ -36,7 +36,7 @@ calcPearsonsR <- function(vals, freq, grps, lambdas) {
   }
 
   ## Put means and lambdas in the same order
-  lambdas = lambdas[match(names(lambdas), grp.nms)]
+  lambdas = lambdas[grp.nms]
   C       = sum(lambdas * means) # contrast
   sumWts  = sum(lambdas^2 / ns) # sum of the weights
   SSw     = sum(ss)

@@ -24,3 +24,25 @@ test_that("calcPearsonsR produces known result", {
   r.res = bootES:::calcPearsonsR(threeGpsVec, freq=rep(1, length(threeGpsVec)), grps=grpLabels3, lambdas=lambdas3)
   expect_equal(truth, r.res, tolerance=1e-4)
 })
+
+test_that("produces same result with non-lexicographic contrast sorting", {
+  dat = data.frame(cond=rep(c("A", "B", "C"), each=10), score=1:30)
+
+  truth = 0.926
+  res_1 = bootES(
+    dat, data.col="score", group.col="cond", contrast=c(A=-1, B=0.5, C=0.5),
+    effect.type="r")$t0
+  expect_equal(truth, res_1, tolerance=1e-3)
+
+
+  res_2 = bootES(
+    dat, data.col="score", group.col="cond", contrast=c(B=0.5, C=0.5, A=-1),
+    effect.type="r")$t0
+  expect_equal(truth, res_2, tolerance=1e-3)
+
+
+  res_3 = bootES(
+    dat, data.col="score", group.col="cond", contrast=c(C=0.5, A=-1, B=0.5),
+    effect.type="r")$t0
+  expect_equal(truth, res_3, tolerance=1e-3)
+})
